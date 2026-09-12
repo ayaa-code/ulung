@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduAI Insight - Dashboard Analitik Pembelajaran</title>
+    <title>ULUNG | AI-Powered Learning Decision Support System</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -52,13 +52,14 @@
                 </div>
             </div>
             <h1 class="text-5xl md:text-7xl font-extrabold mb-4 tracking-tight">
-                EduAI <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Insight</span>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">ULUNG</span>
             </h1>
             <p class="text-xl md:text-2xl text-cyan-200 mb-8 font-light">
-                Personalized Learning Through Artificial Intelligence
+                Detect. Understand. Intervene. Improve.
             </p>
             <p class="text-lg text-slate-300 mb-12 max-w-2xl mx-auto leading-relaxed">
-                Platform pembelajaran adaptif berbasis AI yang membantu guru memahami kemampuan siswa dan memberikan rekomendasi pembelajaran yang lebih efektif.
+                AI-Powered Learning Decision Support System<br>
+                ULUNG: Sistem Pendukung Keputusan Berbasis AI untuk Identifikasi Learning Gap dan Personalisasi Pembelajaran.
             </p>
 
             <div class="flex justify-center">
@@ -327,7 +328,7 @@
         <header class="bg-white border-b border-slate-200 py-4 px-6 md:px-12 flex justify-between items-center">
             <div class="flex items-center gap-2">
                 <div class="p-1.5 bg-blue-100 rounded-lg"><i data-lucide="brain" class="text-blue-600 w-5 h-5"></i></div>
-                <span class="font-bold text-slate-800 text-lg">EduAI Feedback</span>
+                <span class="font-bold text-slate-800 text-lg">ULUNG Feedback</span>
             </div>
             <button onclick="goToStudentHome()" class="text-slate-500 hover:text-red-500 transition-colors flex items-center gap-2 text-sm font-medium">
                 <i data-lucide="log-out" class="w-4 h-4"></i> Keluar
@@ -370,8 +371,37 @@
                             </button>
                         </div>
                     </div>
+
                     <div class="mt-6 pt-6 border-t border-slate-100">
-                        <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="message-circle" class="w-5 h-5 text-blue-600"></i> Tanya EduAI</h3>
+                        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5">
+                            <h3 class="text-lg font-bold text-slate-800 mb-4">AI-Recommended Intervention</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                <div><p class="text-slate-500">Learning Gap</p><p id="res-learning-gap" class="font-semibold text-slate-800"></p></div>
+                                <div><p class="text-slate-500">Risk Level</p><p id="res-risk-level" class="font-semibold text-slate-800"></p></div>
+                                <div><p class="text-slate-500">Mastery</p><p id="res-mastery" class="font-semibold text-slate-800"></p></div>
+                                <div><p class="text-slate-500">Target Mastery</p><p id="res-target-mastery" class="font-semibold text-slate-800"></p></div>
+                            </div>
+                            <div class="mt-4">
+                                <p class="text-slate-500 mb-1">Reason</p>
+                                <p id="res-ai-explanation" class="text-slate-700 leading-relaxed"></p>
+                            </div>
+                            <div class="mt-4">
+                                <p class="text-slate-500 mb-2">Recommended Actions</p>
+                                <ul id="res-recommended-actions" class="list-disc list-inside text-slate-700 space-y-1"></ul>
+                            </div>
+                            <div class="mt-4 flex flex-col sm:flex-row sm:justify-between gap-3 text-sm">
+                                <div><p class="text-slate-500">Intervention Duration</p><p id="res-duration" class="font-semibold text-slate-800"></p></div>
+                                <div><p class="text-slate-500">Intervention Status</p><p id="res-intervention-status" class="font-semibold text-slate-800"></p></div>
+                            </div>
+                            <div class="mt-5 pt-4 border-t border-amber-200">
+                                <h4 class="font-bold text-slate-800 mb-2">Why this recommendation?</h4>
+                                <p id="res-why" class="text-slate-700 leading-relaxed text-sm"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-6 border-t border-slate-100">
+                        <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="message-circle" class="w-5 h-5 text-blue-600"></i> Tanya ULUNG</h3>
                         <form onsubmit="handleStudentChat(event)" class="flex gap-2"><input id="student-chat-input" class="flex-1 px-4 py-3 rounded-xl border border-slate-200 bg-slate-50" placeholder="Kenapa saya perlu belajar topik ini?"><button class="px-4 py-3 bg-blue-600 text-white rounded-xl font-semibold">Tanya</button></form>
                         <p id="student-chat-response" class="hidden mt-3 bg-blue-50 border border-blue-100 rounded-xl p-4 text-sm text-slate-600"></p>
                     </div>
@@ -515,12 +545,53 @@
         </main>
     </section>
 
+    <div id="teacher-modify-modal" class="hidden fixed inset-0 bg-slate-900/50 z-50 backdrop-blur-sm items-center justify-center p-4">
+        <div class="w-full max-w-xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-slate-800">Modify Intervention</h3>
+                <button type="button" onclick="closeTeacherModifyModal()" class="text-slate-500 hover:text-slate-700"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form id="teacher-modify-form" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Intervention Type</label>
+                    <select id="teacher-modify-type" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="ENRICHMENT">ENRICHMENT</option>
+                        <option value="TARGETED REINFORCEMENT">TARGETED REINFORCEMENT</option>
+                        <option value="REMEDIAL INTERVENTION">REMEDIAL INTERVENTION</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Recommended Actions</label>
+                    <textarea id="teacher-modify-actions" rows="5" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Target Mastery</label>
+                        <input id="teacher-modify-target" type="text" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="≥ 80%">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Duration</label>
+                        <input id="teacher-modify-duration" type="text" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="1–2 learning sessions">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Teacher Reason</label>
+                    <textarea id="teacher-modify-reason" rows="3" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" onclick="closeTeacherModifyModal()" class="px-5 py-3 rounded-xl bg-slate-100 text-slate-700 font-semibold">Cancel</button>
+                    <button type="submit" class="px-5 py-3 rounded-xl bg-blue-600 text-white font-semibold">Save & Approve</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <section id="view-teacher" class="view-section flex h-screen overflow-hidden bg-slate-50">
         <!-- Sidebar Desktop -->
         <div class="w-64 h-screen shrink-0 bg-white border-r border-slate-200 flex-col shadow-sm hidden md:flex">
             <div class="p-6 flex items-center gap-3">
                 <div class="p-2 bg-blue-100 rounded-lg"><i data-lucide="brain" class="text-blue-600 w-6 h-6"></i></div>
-                <span class="text-xl font-bold text-slate-800">EduAI Insight</span>
+                <span class="text-xl font-bold text-slate-800">ULUNG</span>
             </div>
             
             <nav class="flex-1 px-4 py-4 space-y-2">
@@ -642,7 +713,7 @@
                     <div class="p-4 border-b border-slate-100 flex items-center gap-3 bg-slate-50 rounded-t-2xl">
                         <div class="p-2 bg-blue-100 text-blue-600 rounded-lg"><i data-lucide="message-square" class="w-5 h-5"></i></div>
                         <div>
-                            <h3 class="font-semibold text-slate-800">EduAI Assistant</h3>
+                            <h3 class="font-semibold text-slate-800">ULUNG Assistant</h3>
                             <p class="text-xs text-green-500 font-medium flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span> Online</p>
                         </div>
                     </div>
@@ -650,7 +721,7 @@
                     <div id="chat-history" class="flex-1 overflow-y-auto p-6 space-y-4">
                         <div class="flex justify-start">
                             <div class="max-w-[75%] p-4 rounded-2xl bg-slate-100 text-slate-700 rounded-tl-none border border-slate-200">
-                                <p class="text-sm leading-relaxed">Halo! Saya EduAI Assistant. Ada yang bisa saya bantu terkait analisis performa siswa kelas Anda hari ini?</p>
+                                <p class="text-sm leading-relaxed">Halo! Saya ULUNG Assistant. Saya membantu menganalisis learning gap dan merekomendasikan intervensi yang sesuai untuk siswa Anda.</p>
                             </div>
                         </div>
                     </div>
@@ -1009,28 +1080,109 @@
             navigateTo('view-chapters');
         }
 
+        function buildInterventionPlan(studentAnalysis) {
+            const weakestTopic = studentAnalysis.weakestTopic || 'Mekanika';
+            const weakScore = studentAnalysis.topicScores?.[weakestTopic] || studentAnalysis.preScore || 0;
+            let risk = 'LOW';
+            if (weakScore < 50 || (studentAnalysis.preScore || 0) < 50) risk = 'HIGH';
+            else if (weakScore < 70 || (studentAnalysis.preScore || 0) < 70) risk = 'MEDIUM';
+
+            const riskTemplates = {
+                LOW: {
+                    interventionType: 'ENRICHMENT',
+                    actions: [
+                        'Materi pengayaan yang memperluas pemahaman konsep',
+                        'Higher-order thinking questions',
+                        'Exploratory learning pada konteks nyata',
+                        'Challenge exercises untuk mengasah kemampuan analisis'
+                    ],
+                    targetMastery: '≥ 85%',
+                    duration: '1 learning session',
+                    status: 'Pending Teacher Review'
+                },
+                MEDIUM: {
+                    interventionType: 'TARGETED REINFORCEMENT',
+                    actions: [
+                        'Review konsep yang belum dikuasai',
+                        'Latihan terarah pada kompetensi utama',
+                        'Additional practice dengan soal bertahap',
+                        'Monitoring progress selama intervensi'
+                    ],
+                    targetMastery: '≥ 80%',
+                    duration: '2 learning sessions',
+                    status: 'Pending Teacher Review'
+                },
+                HIGH: {
+                    interventionType: 'REMEDIAL INTERVENTION',
+                    actions: [
+                        'Review konsep dasar yang masih lemah',
+                        'Materi visual/interaktif untuk memperjelas konsep',
+                        'Latihan remedial 5 soal bertingkat',
+                        'Pendampingan guru pada konsep yang belum dikuasai',
+                        'Reassessment setelah intervensi selesai'
+                    ],
+                    targetMastery: '≥ 80%',
+                    duration: '1–2 learning sessions',
+                    status: 'Pending Teacher Review'
+                }
+            };
+
+            const plan = riskTemplates[risk] || riskTemplates.MEDIUM;
+            return {
+                learningGap: weakestTopic,
+                riskLevel: risk,
+                mastery: `${weakScore}%`,
+                targetMastery: plan.targetMastery,
+                duration: plan.duration,
+                interventionType: plan.interventionType,
+                recommendedActions: plan.actions,
+                status: plan.status,
+                teacherDecision: 'Pending Teacher Review',
+                teacherReason: '',
+                teacherModifiedRecommendation: ''
+            };
+        }
+
         function analyzeStudent(student) {
             const topicScores = student.topicScores || {};
-            const topics = Object.keys(topicScores);
-            const sorted = topics.sort((a, b) => topicScores[a] - topicScores[b]);
+            const sorted = Object.keys(topicScores).sort((a, b) => topicScores[a] - topicScores[b]);
             const weakestTopic = sorted[0] || 'Mekanika';
             const strongestTopic = sorted[sorted.length - 1] || 'Mekanika';
             const score = student.preScore || 0;
-            const riskLevel = weakestTopic && topicScores[weakestTopic] < 50 ? 'Tinggi' : score < 70 ? 'Sedang' : 'Rendah';
-            const aiConfidence = Math.min(96, Math.max(72, Math.round(78 + (100 - (topicScores[weakestTopic] || score)) / 5)));
-            return { ...student, weakestTopic, strongestTopic, riskLevel, aiConfidence, aiExplanation: generateAIExplanation({ ...student, weakestTopic, riskLevel }), aiRecommendation: generateAIRecommendation({ ...student, weakestTopic, strongestTopic, riskLevel }) };
+            const weakScore = topicScores[weakestTopic] || score;
+            let riskLevel = 'LOW';
+            if (weakScore < 50 || score < 50) riskLevel = 'HIGH';
+            else if (weakScore < 70 || score < 70) riskLevel = 'MEDIUM';
+            const aiConfidence = Math.min(96, Math.max(72, Math.round(78 + (100 - weakScore) / 5)));
+            const intervention = buildInterventionPlan({ ...student, weakestTopic, strongestTopic, riskLevel, preScore: score, topicScores });
+            const explanation = `Penguasaan konsep ${weakestTopic} berada di ${weakScore}% dan masih berada di bawah threshold mastery yang ditetapkan. Berdasarkan hasil pre-test, sebagian besar kesalahan mengarah pada kompetensi ${weakestTopic}. ULUNG menilai perlunya intervensi ${intervention.interventionType.toLowerCase()} agar siswa dapat memperbaiki gap tersebut.`;
+            return {
+                ...student,
+                weakestTopic,
+                strongestTopic,
+                riskLevel,
+                aiConfidence,
+                learningGap: weakestTopic,
+                mastery: `${weakScore}%`,
+                aiExplanation: explanation,
+                aiRecommendation: intervention.recommendedActions.join(' · '),
+                recommendation: intervention,
+                interventionPlan: intervention,
+                teacherDecision: intervention.teacherDecision,
+                teacherReason: intervention.teacherReason,
+                teacherModifiedRecommendation: intervention.teacherModifiedRecommendation,
+                riskSummary: `${riskLevel} risk`
+            };
         }
 
         function generateAIRecommendation(studentAnalysis) {
-            const resource = learningResources[studentAnalysis.weakestTopic];
-            if (!resource) return 'Materi pengayaan dan soal HOTS untuk memperluas penerapan konsep.';
-            if ((studentAnalysis.topicScores[studentAnalysis.weakestTopic] || 0) >= 80) return 'AI menyarankan materi pengayaan dan soal HOTS agar pemahaman semakin mendalam.';
-            return `AI menyarankan ${resource.type.toLowerCase()} "${resource.title}", review konsep dasar, dan latihan remedial 5 soal.`;
+            const plan = studentAnalysis.recommendation || buildInterventionPlan(studentAnalysis);
+            return plan.recommendedActions.join(' · ');
         }
 
         function generateAIExplanation(studentAnalysis) {
-            const weakScore = studentAnalysis.topicScores[studentAnalysis.weakestTopic] || 0;
-            return `Siswa dikategorikan ${studentAnalysis.status || 'Perlu Pendampingan'} karena penguasaan ${studentAnalysis.weakestTopic} berada di ${weakScore}% dan memerlukan penguatan pada kompetensi terkait. Insight ini adalah simulasi AI untuk ditinjau guru.`;
+            const weakScore = studentAnalysis.topicScores?.[studentAnalysis.weakestTopic] || studentAnalysis.preScore || 0;
+            return `Penguasaan konsep ${studentAnalysis.weakestTopic} berada di ${weakScore}% dan masih di bawah threshold mastery. Berdasarkan data yang tersedia, sebagian besar kesalahan berada pada kompetensi yang sama, sehingga ULUNG merekomendasikan intervensi yang terarah.`;
         }
 
         function normalizeStudent(student) {
@@ -1041,6 +1193,7 @@
             analyzed.lmsEngagement = analyzed.lmsEngagement || 'Medium';
             analyzed.counselingRecord = analyzed.counselingRecord || 'None';
             analyzed.extracurricular = analyzed.extracurricular || 'Active';
+            analyzed.interventionPlan = analyzed.interventionPlan || buildInterventionPlan(analyzed);
             return analyzed;
         }
 
@@ -1345,6 +1498,16 @@
             document.getElementById('res-strengths').innerHTML = topics.filter(([, value]) => value >= 70).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([topic, value]) => `<li>${topic} (${value}%)</li>`).join('') || '<li>Belum ada topik kuat terdeteksi</li>';
             document.getElementById('res-weaknesses').innerHTML = topics.filter(([, value]) => value < 70).sort((a, b) => a[1] - b[1]).slice(0, 3).map(([topic, value]) => `<li>${topic} (${value}%)</li>`).join('') || '<li>Semua topik berada pada tingkat baik</li>';
             document.getElementById('res-ai-msg').innerText = analysis.aiRecommendation;
+            const plan = analysis.interventionPlan || buildInterventionPlan(analysis);
+            document.getElementById('res-learning-gap').innerText = plan.learningGap;
+            document.getElementById('res-risk-level').innerText = plan.riskLevel;
+            document.getElementById('res-mastery').innerText = plan.mastery;
+            document.getElementById('res-target-mastery').innerText = plan.targetMastery;
+            document.getElementById('res-ai-explanation').innerText = analysis.aiExplanation;
+            document.getElementById('res-recommended-actions').innerHTML = plan.recommendedActions.map(action => `<li>${action}</li>`).join('');
+            document.getElementById('res-duration').innerText = plan.duration;
+            document.getElementById('res-intervention-status').innerText = plan.status;
+            document.getElementById('res-why').innerText = `ULUNG recommends ${plan.interventionType.toLowerCase()} because the student's mastery of ${plan.learningGap} is below the defined mastery threshold. The system identifies this topic as the main learning gap based on the available assessment, engagement, and attendance data.`;
             updateGlobalData(activeStudent);
         }
 
@@ -1478,7 +1641,7 @@
                     addText(`Kompetensi: ${review.competency}`, 10, false, 8);
                 });
             };
-            addText('EDUAI INSIGHT', 16, true, 3);
+            addText('ULUNG', 16, true, 3);
             addText('REKAPAN HASIL BELAJAR', 13, true, 8);
             addText(`Nama siswa: ${activeStudent.name}`);
             addText(`Kelas: ${activeStudent.kelas}`);
@@ -1565,27 +1728,72 @@
             const student = normalizeStudent(allStudentsData.find(item => item.id === id));
             if (!student) return;
             const topics = Object.entries(student.topicScores || {});
+            const plan = student.interventionPlan || buildInterventionPlan(student);
+            const riskBadgeClass = student.riskLevel === 'HIGH' ? 'bg-red-100 text-red-700' : student.riskLevel === 'MEDIUM' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700';
             document.getElementById('analytics-detail').innerHTML = `
-                <div class="flex flex-col md:flex-row md:justify-between gap-3 mb-6"><div><h3 class="text-xl font-bold text-slate-800">${student.name}</h3><p class="text-sm text-slate-500">${student.kelas} · Data considered by AI: academic performance, assessment history, attendance, engagement</p></div><span class="px-3 py-1 h-fit rounded-full text-sm font-semibold ${student.riskLevel === 'Tinggi' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}">Risk Level: ${student.riskLevel}</span></div>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6"><div class="p-4 bg-slate-50 rounded-xl"><p class="text-xs text-slate-500">Pre-Test</p><strong>${student.preScore ?? 0}%</strong></div><div class="p-4 bg-slate-50 rounded-xl"><p class="text-xs text-slate-500">Post-Test</p><strong>${student.postScore ?? '-'}${student.postScore !== undefined ? '%' : ''}</strong></div><div class="p-4 bg-slate-50 rounded-xl"><p class="text-xs text-slate-500">Improvement</p><strong>${student.improvement ?? '-'}${student.improvement !== undefined ? '%' : ''}</strong></div><div class="p-4 bg-blue-50 rounded-xl"><p class="text-xs text-blue-600">AI Confidence</p><strong class="text-blue-700">${student.aiConfidence}%</strong></div></div>
+                <div class="flex flex-col md:flex-row md:justify-between gap-3 mb-6"><div><h3 class="text-xl font-bold text-slate-800">${student.name}</h3><p class="text-sm text-slate-500">${student.kelas} · Data considered by AI: pre-test, topic mastery, attendance, engagement, task completion</p></div><span class="px-3 py-1 h-fit rounded-full text-sm font-semibold ${riskBadgeClass}">Risk Level: ${student.riskLevel}</span></div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6"><div class="p-4 bg-slate-50 rounded-xl"><p class="text-xs text-slate-500">Pre-Test</p><strong>${student.preScore ?? 0}%</strong></div><div class="p-4 bg-slate-50 rounded-xl"><p class="text-xs text-slate-500">Post-Test</p><strong>${student.postScore ?? '-'}${student.postScore !== undefined ? '%' : ''}</strong></div><div class="p-4 bg-slate-50 rounded-xl"><p class="text-xs text-slate-500">Mastery</p><strong>${student.mastery || '-'}</strong></div><div class="p-4 bg-blue-50 rounded-xl"><p class="text-xs text-blue-600">AI Confidence</p><strong class="text-blue-700">${student.aiConfidence}%</strong></div></div>
                 <h4 class="font-bold text-slate-800 mb-3">Topic Mastery</h4>${topics.map(([topic, score]) => `<div class="mb-3"><div class="flex justify-between text-sm mb-1"><span>${topic}</span><strong>${score}%</strong></div><div class="h-2 bg-slate-100 rounded-full"><div class="h-2 rounded-full ${score < 50 ? 'bg-red-500' : score < 70 ? 'bg-yellow-500' : 'bg-green-500'}" style="width:${score}%"></div></div></div>`).join('')}
-                <div class="mt-6 p-4 rounded-xl bg-amber-50 border border-amber-100"><h4 class="font-bold text-amber-800">AI Explanation</h4><p class="text-sm text-slate-700 mt-1">${student.aiExplanation}</p><p class="text-xs text-amber-700 mt-2">Prototype AI factor visualization: Academic 50% · Assessment 30% · Attendance 10% · Engagement 10%</p></div>
-                <div class="mt-6 p-4 rounded-xl bg-blue-50 border border-blue-100"><h4 class="font-bold text-blue-800">AI Suggested Intervention</h4><p id="recommendation-${id}" class="text-sm text-slate-700 mt-1">${student.aiRecommendation}</p><p class="text-xs text-slate-500 mt-2">Teacher approval required</p><div class="flex flex-wrap gap-2 mt-4"><button onclick="decideRecommendation(${id}, 'Approved')" class="px-3 py-2 bg-green-600 text-white rounded-lg text-sm">Approve</button><button onclick="modifyRecommendation(${id})" class="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm">Modify</button><button onclick="decideRecommendation(${id}, 'Rejected')" class="px-3 py-2 bg-red-600 text-white rounded-lg text-sm">Reject</button></div><p id="decision-${id}" class="text-sm font-semibold mt-3">${student.teacherDecision}</p></div>
+                <div class="mt-6 p-4 rounded-xl bg-amber-50 border border-amber-100"><h4 class="font-bold text-amber-800">AI Explanation</h4><p class="text-sm text-slate-700 mt-1">${student.aiExplanation}</p><p class="text-xs text-amber-700 mt-2">Analytical explanation based on assessment performance and weak-topic analysis.</p></div>
+                <div class="mt-6 p-4 rounded-xl bg-blue-50 border border-blue-100"><h4 class="font-bold text-blue-800">AI-Recommended Intervention</h4><p class="text-sm text-slate-700 mt-1"><strong>Learning Gap:</strong> ${plan.learningGap}</p><p class="text-sm text-slate-700 mt-1"><strong>Risk:</strong> ${plan.riskLevel}</p><p class="text-sm text-slate-700 mt-1"><strong>Recommended Actions:</strong> ${plan.recommendedActions.join(' · ')}</p><p class="text-xs text-slate-500 mt-2">Teacher approval required</p><div class="flex flex-wrap gap-2 mt-4"><button onclick="decideRecommendation(${id}, 'Approved')" class="px-3 py-2 bg-green-600 text-white rounded-lg text-sm">Approve</button><button onclick="openTeacherModifyModal(${id})" class="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm">Modify</button><button onclick="decideRecommendation(${id}, 'Rejected')" class="px-3 py-2 bg-red-600 text-white rounded-lg text-sm">Reject</button></div><p id="decision-${id}" class="text-sm font-semibold mt-3">${student.teacherDecision}</p></div>
                 <div class="mt-6 text-sm text-slate-600"><strong>Data Considered by AI:</strong> Academic Performance · Attendance ${student.attendance}% · Learning Engagement ${student.lmsEngagement} · Assessment History · BK ${student.counselingRecord} · Extracurricular ${student.extracurricular}</div>`;
         }
 
         function decideRecommendation(id, decision) {
             const student = allStudentsData.find(item => item.id === id);
-            student.teacherDecision = decision === 'Approved' ? '✓ Approved by Teacher' : 'AI Recommendation Rejected';
+            if (!student) return;
+            const plan = student.interventionPlan || buildInterventionPlan(student);
+            if (decision === 'Approved') {
+                plan.status = 'Intervention Approved';
+                student.teacherDecision = 'Intervention Approved';
+            } else if (decision === 'Rejected') {
+                plan.status = 'Rejected by Teacher';
+                student.teacherDecision = 'Rejected by Teacher';
+            }
+            student.interventionPlan = plan;
+            student.teacherReason = student.teacherReason || 'Teacher reviewed the recommendation.';
             updateGlobalData(student);
             document.getElementById(`decision-${id}`).innerText = student.teacherDecision;
         }
 
-        function modifyRecommendation(id) {
+        function openTeacherModifyModal(id) {
             const student = allStudentsData.find(item => item.id === id);
-            const modified = window.prompt('Ubah rekomendasi intervensi:', student.teacherModifiedRecommendation || student.aiRecommendation);
-            if (modified) { student.teacherModifiedRecommendation = modified; student.teacherDecision = 'Modified by Teacher'; updateGlobalData(student); showStudentAnalytics(id); }
+            if (!student) return;
+            const plan = student.interventionPlan || buildInterventionPlan(student);
+            document.getElementById('teacher-modify-type').value = plan.interventionType;
+            document.getElementById('teacher-modify-actions').value = plan.recommendedActions.join('\n');
+            document.getElementById('teacher-modify-target').value = plan.targetMastery;
+            document.getElementById('teacher-modify-duration').value = plan.duration;
+            document.getElementById('teacher-modify-reason').value = student.teacherReason || '';
+            document.getElementById('teacher-modify-form').dataset.studentId = String(id);
+            document.getElementById('teacher-modify-modal').classList.remove('hidden');
+            document.getElementById('teacher-modify-modal').classList.add('flex');
+            lucide.createIcons();
         }
+
+        function closeTeacherModifyModal() {
+            document.getElementById('teacher-modify-modal').classList.add('hidden');
+            document.getElementById('teacher-modify-modal').classList.remove('flex');
+        }
+
+        document.getElementById('teacher-modify-form')?.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const id = Number(this.dataset.studentId);
+            const student = allStudentsData.find(item => item.id === id);
+            if (!student) return;
+            const plan = student.interventionPlan || buildInterventionPlan(student);
+            plan.interventionType = document.getElementById('teacher-modify-type').value;
+            plan.recommendedActions = document.getElementById('teacher-modify-actions').value.split('\n').map(item => item.trim()).filter(Boolean);
+            plan.targetMastery = document.getElementById('teacher-modify-target').value;
+            plan.duration = document.getElementById('teacher-modify-duration').value;
+            plan.status = 'Modified & Approved';
+            student.teacherDecision = 'Modified & Approved';
+            student.teacherReason = document.getElementById('teacher-modify-reason').value;
+            student.interventionPlan = plan;
+            updateGlobalData(student);
+            closeTeacherModifyModal();
+            showStudentAnalytics(id);
+        });
 
         function renderProgressList() {
             loadPersistedData();
@@ -1598,7 +1806,8 @@
             if (!student) return;
             selectedTeacherStudentId = id;
             const history = getChapterHistory(student);
-            document.getElementById('teacher-progress-detail').innerHTML = `<div class="flex justify-between gap-3 mb-5"><div><h3 class="text-xl font-bold text-slate-800">${student.name}</h3><p class="text-sm text-slate-500">${student.kelas} · ${history.length} bab</p></div><button onclick="downloadTeacherReport(${student.id})" class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold flex items-center gap-2"><i data-lucide="download" class="w-4 h-4"></i> Download</button></div>${history.length ? `<div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="bg-slate-50"><tr><th class="p-3">Bab</th><th class="p-3">Pre</th><th class="p-3">Post</th><th class="p-3">Perubahan</th><th class="p-3">Status</th></tr></thead><tbody class="divide-y divide-slate-100">${history.map(record => `<tr><td class="p-3"><strong>${record.title}</strong><p class="text-xs text-slate-500">Lemah: ${(record.weakTopics || []).join(', ') || '-'}</p><p class="text-xs text-slate-500">Analisis AI: ${record.aiExplanation || '-'}</p><p class="text-xs text-slate-500">Rekomendasi: ${record.recommendation || '-'}</p></td><td class="p-3">${record.preScore ?? '-'}${record.preScore !== null ? '%' : ''}</td><td class="p-3">${record.postScore ?? '-'}${record.postScore !== null ? '%' : ''}</td><td class="p-3 font-semibold ${record.improvement >= 0 ? 'text-green-600' : 'text-red-600'}">${record.improvement === null ? '-' : `${record.improvement >= 0 ? '+' : ''}${record.improvement}%`}</td><td class="p-3"><span class="px-2 py-1 rounded-full text-xs font-semibold ${record.status === 'Sudah selesai' ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'}">${record.status}</span><p class="text-xs text-slate-500 mt-1">${record.completedAt || '-'}</p></td></tr>`).join('')}</tbody></table></div>` : '<p class="text-sm text-slate-500">Belum ada bab yang dikerjakan siswa ini.</p>'}`;
+            const interventionPlan = student.interventionPlan || buildInterventionPlan(student);
+            document.getElementById('teacher-progress-detail').innerHTML = `<div class="flex justify-between gap-3 mb-5"><div><h3 class="text-xl font-bold text-slate-800">${student.name}</h3><p class="text-sm text-slate-500">${student.kelas} · ${history.length} bab</p></div><button onclick="downloadTeacherReport(${student.id})" class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold flex items-center gap-2"><i data-lucide="download" class="w-4 h-4"></i> Download</button></div>${history.length ? `<div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="bg-slate-50"><tr><th class="p-3">Bab</th><th class="p-3">Pre</th><th class="p-3">Post</th><th class="p-3">Perubahan</th><th class="p-3">Status</th></tr></thead><tbody class="divide-y divide-slate-100">${history.map(record => `<tr><td class="p-3"><strong>${record.title}</strong><p class="text-xs text-slate-500">Lemah: ${(record.weakTopics || []).join(', ') || '-'}</p><p class="text-xs text-slate-500">Analisis AI: ${record.aiExplanation || '-'}</p><p class="text-xs text-slate-500">Rekomendasi: ${record.recommendation || '-'}</p></td><td class="p-3">${record.preScore ?? '-'}${record.preScore !== null ? '%' : ''}</td><td class="p-3">${record.postScore ?? '-'}${record.postScore !== null ? '%' : ''}</td><td class="p-3 font-semibold ${record.improvement >= 0 ? 'text-green-600' : 'text-red-600'}">${record.improvement === null ? '-' : `${record.improvement >= 0 ? '+' : ''}${record.improvement}%`}</td><td class="p-3"><span class="px-2 py-1 rounded-full text-xs font-semibold ${record.status === 'Sudah selesai' ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'}">${record.status}</span><p class="text-xs text-slate-500 mt-1">${record.completedAt || '-'}</p></td></tr>`).join('')}</tbody></table></div>` : '<p class="text-sm text-slate-500">Belum ada bab yang dikerjakan siswa ini.</p>'}<div class="mt-6 p-5 rounded-2xl bg-amber-50 border border-amber-200"><h4 class="font-bold text-slate-800 mb-3">AI-Recommended Intervention</h4><p><strong>Learning Gap:</strong> ${interventionPlan.learningGap}</p><p><strong>Risk Level:</strong> ${interventionPlan.riskLevel}</p><p><strong>Recommended Actions:</strong> ${interventionPlan.recommendedActions.join(' · ')}</p><p><strong>Intervention Status:</strong> ${student.teacherDecision || interventionPlan.status}</p></div>`;
             lucide.createIcons();
         }
 
@@ -1641,7 +1850,7 @@
             const analysis = normalizeStudent(activeStudent);
             const askedTopic = input.value.toLowerCase().includes('gelombang') ? 'Gelombang' : analysis.weakestTopic;
             const score = analysis.topicScores[askedTopic] || 0;
-            response.innerText = `Berdasarkan hasil pre-test, penguasaanmu pada ${askedTopic} masih ${score}%. EduAI menyarankan ${learningResources[askedTopic]?.type.toLowerCase() || 'materi tambahan'} dan latihan sebelum post-test. Guru tetap meninjau rekomendasi ini.`;
+            response.innerText = `Berdasarkan hasil pre-test, penguasaanmu pada ${askedTopic} masih ${score}%. ULUNG menyarankan ${learningResources[askedTopic]?.type.toLowerCase() || 'materi tambahan'} dan latihan sebelum post-test. Guru tetap meninjau rekomendasi ini.`;
             response.classList.remove('hidden');
             input.value = '';
         }
