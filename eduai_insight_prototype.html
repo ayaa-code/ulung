@@ -382,12 +382,22 @@
                                 <div><p class="text-slate-500">Target Mastery</p><p id="res-target-mastery" class="font-semibold text-slate-800"></p></div>
                             </div>
                             <div class="mt-4">
-                                <p class="text-slate-500 mb-1">Reason</p>
+                                <p class="text-slate-500 mb-1">Diagnosis</p>
                                 <p id="res-ai-explanation" class="text-slate-700 leading-relaxed"></p>
                             </div>
-                            <div class="mt-4">
-                                <p class="text-slate-500 mb-2">Recommended Actions</p>
-                                <ul id="res-recommended-actions" class="list-disc list-inside text-slate-700 space-y-1"></ul>
+                            <div class="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
+                                <div class="bg-white/70 rounded-xl p-3 border border-amber-100">
+                                    <p class="text-slate-500 mb-2 font-medium">Student Action</p>
+                                    <ul id="res-recommended-actions" class="list-disc list-inside text-slate-700 space-y-1 text-sm"></ul>
+                                </div>
+                                <div class="bg-white/70 rounded-xl p-3 border border-amber-100">
+                                    <p class="text-slate-500 mb-2 font-medium">Teacher Action</p>
+                                    <ul id="res-teacher-actions" class="list-disc list-inside text-slate-700 space-y-1 text-sm"></ul>
+                                </div>
+                                <div class="bg-white/70 rounded-xl p-3 border border-amber-100">
+                                    <p class="text-slate-500 mb-2 font-medium">School Support</p>
+                                    <ul id="res-school-actions" class="list-disc list-inside text-slate-700 space-y-1 text-sm"></ul>
+                                </div>
                             </div>
                             <div class="mt-4 flex flex-col sm:flex-row sm:justify-between gap-3 text-sm">
                                 <div><p class="text-slate-500">Intervention Duration</p><p id="res-duration" class="font-semibold text-slate-800"></p></div>
@@ -1096,6 +1106,16 @@
                         'Exploratory learning pada konteks nyata',
                         'Challenge exercises untuk mengasah kemampuan analisis'
                     ],
+                    teacherActions: [
+                        'Mendorong siswa mengerjakan soal analisis tingkat lanjut',
+                        'Memberikan pertanyaan reflektif untuk memperdalam pemahaman',
+                        'Memantau kecepatan progres setelah pengayaan'
+                    ],
+                    schoolActions: [
+                        'Mengintegrasikan kegiatan pengayaan kelas untuk siswa dengan pencapaian di atas rata-rata',
+                        'Menyediakan bahan tambahan untuk pengembangan kemampuan analisis',
+                        'Memantau efektivitas pengayaan secara berkala'
+                    ],
                     targetMastery: '≥ 85%',
                     duration: '1 learning session',
                     status: 'Pending Teacher Review'
@@ -1107,6 +1127,16 @@
                         'Latihan terarah pada kompetensi utama',
                         'Additional practice dengan soal bertahap',
                         'Monitoring progress selama intervensi'
+                    ],
+                    teacherActions: [
+                        'Mengulas kembali konsep paling lemah bersama siswa',
+                        'Memberikan latihan terarah dan membahas kesalahan secara langsung',
+                        'Mengatur jadwal follow-up untuk pengecekan pemahaman'
+                    ],
+                    schoolActions: [
+                        'Menjadwalkan sesi pendampingan tambahan bagi siswa yang masih di bawah target',
+                        'Menyediakan data progres siswa untuk monitoring guru dan wali kelas',
+                        'Koordinasi dengan guru mata pelajaran jika kebutuhan pembelajaran masih belum tertangani'
                     ],
                     targetMastery: '≥ 80%',
                     duration: '2 learning sessions',
@@ -1120,6 +1150,16 @@
                         'Latihan remedial 5 soal bertingkat',
                         'Pendampingan guru pada konsep yang belum dikuasai',
                         'Reassessment setelah intervensi selesai'
+                    ],
+                    teacherActions: [
+                        'Mengajarkan kembali konsep dasar secara bertahap dengan contoh konkret',
+                        'Memberikan pendampingan individual atau kelompok kecil',
+                        'Menetapkan target remedial dan evaluasi mingguan'
+                    ],
+                    schoolActions: [
+                        'Mengalokasikan waktu pembelajaran remedial di jadwal kelas',
+                        'Menyiapkan guru pendamping atau tutor sebaya untuk siswa berisiko tinggi',
+                        'Memonitor hasil reassessment dan tindak lanjut sekolah'
                     ],
                     targetMastery: '≥ 80%',
                     duration: '1–2 learning sessions',
@@ -1136,6 +1176,8 @@
                 duration: plan.duration,
                 interventionType: plan.interventionType,
                 recommendedActions: plan.actions,
+                teacherActions: plan.teacherActions,
+                schoolActions: plan.schoolActions,
                 status: plan.status,
                 teacherDecision: 'Pending Teacher Review',
                 teacherReason: '',
@@ -1155,7 +1197,7 @@
             else if (weakScore < 70 || score < 70) riskLevel = 'MEDIUM';
             const aiConfidence = Math.min(96, Math.max(72, Math.round(78 + (100 - weakScore) / 5)));
             const intervention = buildInterventionPlan({ ...student, weakestTopic, strongestTopic, riskLevel, preScore: score, topicScores });
-            const explanation = `Penguasaan konsep ${weakestTopic} berada di ${weakScore}% dan masih berada di bawah threshold mastery yang ditetapkan. Berdasarkan hasil pre-test, sebagian besar kesalahan mengarah pada kompetensi ${weakestTopic}. ULUNG menilai perlunya intervensi ${intervention.interventionType.toLowerCase()} agar siswa dapat memperbaiki gap tersebut.`;
+            const explanation = `AI mengidentifikasi learning gap pada ${weakestTopic}. Penguasaan konsep siswa berada di ${weakScore}% dan masih di bawah threshold mastery yang ditetapkan. Kesalahan yang paling sering muncul menunjukkan siswa belum sepenuhnya memahami konsep inti pada kompetensi tersebut. Oleh karena itu, ULUNG merekomendasikan ${intervention.interventionType.toLowerCase()} agar guru dapat memberikan tindakan yang tepat pada siswa dan sekolah dapat menyiapkan pendampingan yang relevan.`;
             return {
                 ...student,
                 weakestTopic,
@@ -1505,9 +1547,11 @@
             document.getElementById('res-target-mastery').innerText = plan.targetMastery;
             document.getElementById('res-ai-explanation').innerText = analysis.aiExplanation;
             document.getElementById('res-recommended-actions').innerHTML = plan.recommendedActions.map(action => `<li>${action}</li>`).join('');
+            document.getElementById('res-teacher-actions').innerHTML = (plan.teacherActions || []).map(action => `<li>${action}</li>`).join('');
+            document.getElementById('res-school-actions').innerHTML = (plan.schoolActions || []).map(action => `<li>${action}</li>`).join('');
             document.getElementById('res-duration').innerText = plan.duration;
             document.getElementById('res-intervention-status').innerText = plan.status;
-            document.getElementById('res-why').innerText = `ULUNG recommends ${plan.interventionType.toLowerCase()} because the student's mastery of ${plan.learningGap} is below the defined mastery threshold. The system identifies this topic as the main learning gap based on the available assessment, engagement, and attendance data.`;
+            document.getElementById('res-why').innerText = `ULUNG recommends ${plan.interventionType.toLowerCase()} because the student's mastery of ${plan.learningGap} is below the defined mastery threshold. The system identifies this topic as the main learning gap from the assessment data, and the recommended action is directed to the teacher and school so support can be delivered immediately.`;
             updateGlobalData(activeStudent);
         }
 
@@ -1735,7 +1779,7 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6"><div class="p-4 bg-slate-50 rounded-xl"><p class="text-xs text-slate-500">Pre-Test</p><strong>${student.preScore ?? 0}%</strong></div><div class="p-4 bg-slate-50 rounded-xl"><p class="text-xs text-slate-500">Post-Test</p><strong>${student.postScore ?? '-'}${student.postScore !== undefined ? '%' : ''}</strong></div><div class="p-4 bg-slate-50 rounded-xl"><p class="text-xs text-slate-500">Mastery</p><strong>${student.mastery || '-'}</strong></div><div class="p-4 bg-blue-50 rounded-xl"><p class="text-xs text-blue-600">AI Confidence</p><strong class="text-blue-700">${student.aiConfidence}%</strong></div></div>
                 <h4 class="font-bold text-slate-800 mb-3">Topic Mastery</h4>${topics.map(([topic, score]) => `<div class="mb-3"><div class="flex justify-between text-sm mb-1"><span>${topic}</span><strong>${score}%</strong></div><div class="h-2 bg-slate-100 rounded-full"><div class="h-2 rounded-full ${score < 50 ? 'bg-red-500' : score < 70 ? 'bg-yellow-500' : 'bg-green-500'}" style="width:${score}%"></div></div></div>`).join('')}
                 <div class="mt-6 p-4 rounded-xl bg-amber-50 border border-amber-100"><h4 class="font-bold text-amber-800">AI Explanation</h4><p class="text-sm text-slate-700 mt-1">${student.aiExplanation}</p><p class="text-xs text-amber-700 mt-2">Analytical explanation based on assessment performance and weak-topic analysis.</p></div>
-                <div class="mt-6 p-4 rounded-xl bg-blue-50 border border-blue-100"><h4 class="font-bold text-blue-800">AI-Recommended Intervention</h4><p class="text-sm text-slate-700 mt-1"><strong>Learning Gap:</strong> ${plan.learningGap}</p><p class="text-sm text-slate-700 mt-1"><strong>Risk:</strong> ${plan.riskLevel}</p><p class="text-sm text-slate-700 mt-1"><strong>Recommended Actions:</strong> ${plan.recommendedActions.join(' · ')}</p><p class="text-xs text-slate-500 mt-2">Teacher approval required</p><div class="flex flex-wrap gap-2 mt-4"><button onclick="decideRecommendation(${id}, 'Approved')" class="px-3 py-2 bg-green-600 text-white rounded-lg text-sm">Approve</button><button onclick="openTeacherModifyModal(${id})" class="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm">Modify</button><button onclick="decideRecommendation(${id}, 'Rejected')" class="px-3 py-2 bg-red-600 text-white rounded-lg text-sm">Reject</button></div><p id="decision-${id}" class="text-sm font-semibold mt-3">${student.teacherDecision}</p></div>
+                <div class="mt-6 p-4 rounded-xl bg-blue-50 border border-blue-100"><h4 class="font-bold text-blue-800">AI-Recommended Intervention</h4><p class="text-sm text-slate-700 mt-1"><strong>Learning Gap:</strong> ${plan.learningGap}</p><p class="text-sm text-slate-700 mt-1"><strong>Risk:</strong> ${plan.riskLevel}</p><p class="text-sm text-slate-700 mt-1"><strong>Student Action:</strong> ${plan.recommendedActions.join(' · ')}</p><p class="text-sm text-slate-700 mt-1"><strong>Teacher Action:</strong> ${(plan.teacherActions || []).join(' · ')}</p><p class="text-sm text-slate-700 mt-1"><strong>School Support:</strong> ${(plan.schoolActions || []).join(' · ')}</p><p class="text-xs text-slate-500 mt-2">Teacher approval required</p><div class="flex flex-wrap gap-2 mt-4"><button onclick="decideRecommendation(${id}, 'Approved')" class="px-3 py-2 bg-green-600 text-white rounded-lg text-sm">Approve</button><button onclick="openTeacherModifyModal(${id})" class="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm">Modify</button><button onclick="decideRecommendation(${id}, 'Rejected')" class="px-3 py-2 bg-red-600 text-white rounded-lg text-sm">Reject</button></div><p id="decision-${id}" class="text-sm font-semibold mt-3">${student.teacherDecision}</p></div>
                 <div class="mt-6 text-sm text-slate-600"><strong>Data Considered by AI:</strong> Academic Performance · Attendance ${student.attendance}% · Learning Engagement ${student.lmsEngagement} · Assessment History · BK ${student.counselingRecord} · Extracurricular ${student.extracurricular}</div>`;
         }
 
