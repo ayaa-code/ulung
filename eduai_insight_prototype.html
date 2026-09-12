@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduAI Insight - Dashboard Analitik Pembelajaran</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js untuk Grafik -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- jsPDF untuk mengunduh rekapan jawaban -->
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            overflow-x: hidden;
+        }
+        .view-section {
+            display: none !important;
+            min-height: 100vh;
+        }
+        .view-section.active {
+            display: flex !important;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .bg-pattern { background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.1; }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <section id="view-landing" class="view-section active flex-col justify-center items-center relative overflow-hidden bg-slate-900 text-white">
+        <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-20"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-blue-600 rounded-full mix-blend-multiply filter blur-[128px] opacity-20"></div>
+
+        <div class="z-10 text-center max-w-4xl px-6">
+            <div class="flex justify-center mb-6">
+                <div class="p-4 bg-blue-900/50 rounded-2xl border border-blue-500/30">
+                    <i data-lucide="brain" class="text-cyan-400 w-16 h-16"></i>
+                </div>
+            </div>
+            <h1 class="text-5xl md:text-7xl font-extrabold mb-4 tracking-tight">
+                EduAI <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Insight</span>
+            </h1>
+            <p class="text-xl md:text-2xl text-cyan-200 mb-8 font-light">
+                Personalized Learning Through Artificial Intelligence
+            </p>
+            <p class="text-lg text-slate-300 mb-12 max-w-2xl mx-auto leading-relaxed">
+                Platform pembelajaran adaptif berbasis AI yang membantu guru memahami kemampuan siswa dan memberikan rekomendasi pembelajaran yang lebih efektif.
+            </p>
+
+            <div class="flex justify-center">
+                <button onclick="navigateTo('view-auth')" class="px-8 py-4 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg font-semibold text-lg transition-all transform hover:scale-105 flex items-center justify-center gap-2">
+                    <i data-lucide="book-open" class="w-5 h-5"></i> Login Siswa
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section id="view-auth" class="view-section flex-col items-center justify-center relative overflow-hidden bg-slate-50 p-6">
+        <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-20"></div>
+        <div class="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden z-10">
+            <div class="p-8 bg-gradient-to-br from-blue-600 to-indigo-700 text-white text-center relative overflow-hidden">
+                <div class="absolute top-[-20%] left-[-10%] w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+                <div class="relative z-10 flex justify-center mb-4">
+                    <div class="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-inner">
+                        <i data-lucide="lock" class="w-8 h-8 text-white"></i>
+                    </div>
+                </div>
+                <h2 id="auth-title" class="text-2xl font-bold mb-1">Login Siswa</h2>
+                <p id="auth-subtitle" class="text-blue-100 text-sm">Masuk untuk melanjutkan pembelajaran</p>
+            </div>
+            
+            <form id="auth-form" class="p-8 space-y-5" onsubmit="handleAuth(event)">
+                <div id="auth-error" class="hidden p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl flex items-center gap-2 animate-pulse">
+                    <i data-lucide="alert-triangle" class="w-4 h-4"></i> <span id="auth-error-msg"></span>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Alamat Email</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i data-lucide="mail" class="w-4 h-4 text-slate-400"></i>
+                        </div>
+                        <input type="email" id="auth-email" required class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-slate-50 focus:bg-white" placeholder="pengguna@gmail.com">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i data-lucide="lock" class="w-4 h-4 text-slate-400"></i>
+                        </div>
+                        <input type="password" id="auth-password" required class="w-full pl-11 pr-12 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-slate-50 focus:bg-white" placeholder="••••••••">
+                        <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-blue-600 transition-colors">
+                            <i data-lucide="eye" id="eye-icon" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="text-sm text-center pt-2">
+                    <span id="auth-switch-text" class="text-slate-500">Belum punya akun? </span>
+                    <button type="button" onclick="switchAuthMode()" id="auth-switch-btn" class="text-blue-600 font-semibold hover:underline">Daftar di sini</button>
+                </div>
+
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="navigateTo('view-landing')" class="px-6 py-3 rounded-xl font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors">Kembali</button>
+                    <button type="submit" id="auth-submit-btn" class="flex-1 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2">
+                        Login <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <section id="view-profile" class="view-section flex-col items-center justify-center relative overflow-hidden bg-slate-50 p-6">
+        <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-20"></div>
+        <div class="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden z-10">
+            <div class="p-8 bg-gradient-to-br from-blue-600 to-indigo-700 text-white text-center relative overflow-hidden">
+                <div class="absolute top-[-20%] left-[-10%] w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+                <div class="relative z-10 flex justify-center mb-4">
+                    <div class="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-inner">
+                        <i data-lucide="user-plus" class="w-8 h-8 text-white"></i>
+                    </div>
+                </div>
+                <h2 class="text-2xl font-bold mb-1">Lengkapi Profil</h2>
+                <p class="text-blue-100 text-sm">Isi data diri untuk melengkapi akun belajarmu</p>
+            </div>
+            
+            <form class="p-8 space-y-5" onsubmit="handleProfileSubmit(event)">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Nama Lengkap</label>
+                    <input type="text" id="profile-name" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-slate-50 focus:bg-white" placeholder="Contoh: Ahmad Rizky">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Kelas</label>
+                    <select id="profile-class" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-slate-50 focus:bg-white">
+                        <option value="">Pilih...</option>
+                        <option value="Kelas X">Kelas X</option>
+                        <option value="Kelas XI">Kelas XI</option>
+                        <option value="Kelas XII">Kelas XII</option>
+                    </select>
+                </div>
+
+                <div class="pt-4 flex gap-3">
+                    <button type="submit" class="flex-1 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2">
+                        Pilih Materi <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <section id="view-chapters" class="view-section flex-col bg-slate-50 pb-12">
+        <header class="bg-white border-b border-slate-200 py-4 px-6 md:px-12 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="p-1.5 bg-blue-100 rounded-lg"><i data-lucide="library" class="text-blue-600 w-5 h-5"></i></div>
+                <span class="font-bold text-slate-800 text-lg">Pilih Materi Belajar</span>
+            </div>
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                <span id="student-header-name" class="text-sm font-semibold text-slate-700 truncate max-w-[9rem] sm:max-w-none"></span>
+                <button onclick="goToStudentHome()" class="shrink-0 text-slate-500 hover:text-red-500 transition-colors flex items-center gap-2 text-sm font-medium">
+                    <i data-lucide="log-out" class="w-4 h-4"></i> Keluar
+                </button>
+            </div>
+        </header>
+        <main class="max-w-5xl w-full mx-auto mt-8 px-6 flex flex-col">
+            <div class="mb-8 order-1">
+                <p class="text-sm font-semibold text-blue-600 mb-2"><span id="chapter-class-label">-</span></p>
+                <h1 id="class-page-title" class="text-3xl font-bold text-slate-800 mb-2">Pilih aktivitas belajar</h1>
+                <p id="class-page-description" class="text-slate-500">Akses buku pembelajaran atau pilih bab kuis sesuai kebutuhanmu.</p>
+            </div>
+            <div id="class-options" class="grid grid-cols-1 md:grid-cols-2 gap-6 order-2 mb-8">
+                <article class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-200 flex flex-col">
+                    <div class="flex items-start justify-between gap-4 mb-5">
+                        <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center"><i data-lucide="book-open-text" class="w-6 h-6"></i></div>
+                        <span class="text-xs font-bold uppercase tracking-wide text-blue-600 bg-blue-50 px-3 py-1 rounded-full">Materi</span>
+                    </div>
+                    <h2 id="material-card-title" class="text-2xl font-bold text-slate-800 mb-3">Materi Fisika</h2>
+                    <p class="text-slate-500 leading-relaxed mb-6">Pelajari materi Fisika melalui buku pembelajaran yang tersedia.</p>
+                    <div class="mt-auto flex flex-col sm:flex-row gap-3">
+                        <a id="material-view-link" href="#" target="_blank" rel="noopener noreferrer" class="flex-1 px-4 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-center transition-colors">Lihat Materi</a>
+                        <a id="material-download-link" href="#" download class="flex-1 px-4 py-3 rounded-xl border border-blue-200 text-blue-700 hover:bg-blue-50 font-semibold text-center transition-colors">Download PDF</a>
+                    </div>
+                </article>
+                <article class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-200 flex flex-col">
+                    <div class="flex items-start justify-between gap-4 mb-5">
+                        <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center"><i data-lucide="clipboard-check" class="w-6 h-6"></i></div>
+                        <span class="text-xs font-bold uppercase tracking-wide text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">Kuis</span>
+                    </div>
+                    <h2 id="quiz-card-title" class="text-2xl font-bold text-slate-800 mb-3">Kuis Fisika</h2>
+                    <p class="text-slate-500 leading-relaxed mb-6">Pilih salah satu bab untuk menguji pemahamanmu.</p>
+                    <button type="button" onclick="showQuizChapters()" class="mt-auto w-full px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-semibold transition-colors flex items-center justify-center gap-2">Pilih Kuis <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+                </article>
+            </div>
+            <div id="quiz-chapters-panel" class="hidden order-2 mb-8">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+                    <div><p class="text-sm font-semibold text-blue-600 mb-1">Kuis Fisika</p><h2 class="text-2xl font-bold text-slate-800">Pilih Bab Kuis</h2></div>
+                    <button type="button" onclick="showClassOptions()" class="self-start px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold flex items-center gap-2"><i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali</button>
+                </div>
+                <div id="chapter-list" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+            </div>
+            <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-200 mb-8 order-3">
+                <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6">
+                    <div>
+                        <p class="text-sm font-semibold text-blue-600 mb-1">Progress Siswa</p>
+                        <h2 class="text-xl font-bold text-slate-800">Perkembangan Belajar</h2>
+                        <p id="chapter-progress-caption" class="text-sm text-slate-500 mt-1">Grafik akan muncul setelah kamu menyelesaikan satu bab.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-3">
+                        <div class="px-4 py-3 rounded-xl bg-blue-50 text-center"><p class="text-xs text-blue-600">Bab selesai</p><strong id="chapter-completed-count" class="text-lg text-blue-700">0</strong></div>
+                        <div class="px-4 py-3 rounded-xl bg-slate-50 text-center"><p class="text-xs text-slate-500">Rata-rata Pre</p><strong id="chapter-pre-average" class="text-lg text-slate-800">-</strong></div>
+                        <div class="px-4 py-3 rounded-xl bg-green-50 text-center"><p class="text-xs text-green-600">Rata-rata Post</p><strong id="chapter-post-average" class="text-lg text-green-700">-</strong></div>
+                        <div class="px-4 py-3 rounded-xl bg-amber-50 text-center"><p class="text-xs text-amber-600">Peningkatan</p><strong id="chapter-improvement-average" class="text-lg text-amber-700">-</strong></div>
+                    </div>
+                </div>
+                <div class="h-64 md:h-72">
+                    <canvas id="chapter-progress-chart"></canvas>
+                </div>
+                <div id="chapter-empty-state" class="hidden text-center py-10 text-slate-500"><i data-lucide="bar-chart-3" class="w-10 h-10 mx-auto mb-3 text-slate-300"></i><p>Grafik perkembangan akan muncul setelah siswa menyelesaikan satu bab.</p></div>
+            </div>
+            <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-200 mt-8 order-4">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+                    <div><h2 class="text-xl font-bold text-slate-800">Riwayat Belajar per Bab</h2><p class="text-sm text-slate-500 mt-1">Rangkuman hasil belajar setiap bab yang kamu kerjakan.</p></div>
+                    <div class="flex gap-2"><button onclick="downloadStudentReport()" class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold flex items-center gap-2"><i data-lucide="download" class="w-4 h-4"></i> Download Laporan</button><button onclick="sendProgressToTeacher()" class="px-4 py-2 rounded-lg bg-slate-800 text-white text-sm font-semibold flex items-center gap-2"><i data-lucide="send" class="w-4 h-4"></i> Kirim ke Guru</button></div>
+                </div>
+                <div id="chapter-history-list" class="space-y-3"></div>
+            </div>
+        </main>
+        <div id="chapter-choice-dialog" class="hidden fixed inset-0 z-30 bg-slate-900/50 backdrop-blur-sm items-center justify-center p-6">
+            <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8">
+                <div class="flex justify-between items-start gap-4 mb-6">
+                    <div>
+                        <p class="text-sm font-semibold text-blue-600 mb-1">Materi terpilih</p>
+                        <h2 id="chapter-choice-title" class="text-2xl font-bold text-slate-800">-</h2>
+                    </div>
+                    <button onclick="closeChapterChoice()" aria-label="Tutup pilihan" class="p-2 text-slate-400 hover:text-slate-700"><i data-lucide="x" class="w-5 h-5"></i></button>
+                </div>
+                <p class="text-slate-500 mb-6">Kamu mau memahami materi terlebih dahulu atau langsung mengerjakan kuis?</p>
+                <div class="space-y-3">
+                    <button onclick="chooseChapterAction('learn')" class="w-full flex items-center gap-3 p-4 rounded-xl border-2 border-blue-100 text-left hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                        <i data-lucide="book-open" class="w-5 h-5 text-blue-600"></i><span><strong class="block text-slate-800">Pelajari Materi Dulu</strong><small class="text-slate-500">Baca modul sebelum mengerjakan kuis.</small></span>
+                    </button>
+                    <button onclick="chooseChapterAction('quiz')" class="w-full flex items-center gap-3 p-4 rounded-xl border-2 border-slate-200 text-left hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                        <i data-lucide="clipboard-list" class="w-5 h-5 text-blue-600"></i><span><strong class="block text-slate-800">Langsung Kuis</strong><small class="text-slate-500">Mulai pre-test untuk bab ini sekarang.</small></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="view-assessment" class="view-section flex-col bg-slate-50">
+        <header class="bg-white border-b border-slate-200 py-4 px-6 md:px-12 flex justify-between items-center sticky top-0 z-10 shadow-sm">
+            <div class="flex items-center gap-2">
+                <div class="p-1.5 bg-blue-100 rounded-lg">
+                    <i data-lucide="book-open" class="text-blue-600 w-5 h-5"></i>
+                </div>
+                <span id="assessment-title" class="font-bold text-slate-800 text-lg">Pre-Test Fisika</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="text-sm text-slate-500 font-medium bg-slate-100 px-3 py-1 rounded-full hidden sm:block">
+                    Peserta: <span id="assessment-student-name" class="text-slate-800 font-bold">Siswa</span>
+                </span>
+                <button onclick="goToStudentHome()" class="text-slate-500 hover:text-red-500 transition-colors">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="flex-1 flex items-center justify-center p-6">
+            <div class="max-w-3xl w-full bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden relative">
+                
+                <div id="ai-loading" class="hidden absolute inset-0 bg-white/90 backdrop-blur-sm z-20 flex-col items-center justify-center">
+                    <div class="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+                    <h3 class="text-xl font-bold text-slate-800">AI Sedang Menganalisis...</h3>
+                    <p class="text-slate-500 mt-2">Mengevaluasi pola jawaban dan pemahaman konsepmu.</p>
+                </div>
+
+                <div class="w-full h-2 bg-slate-100">
+                    <div id="quiz-progress" class="h-full bg-gradient-to-r from-blue-400 to-blue-600 transition-all duration-500 ease-out" style="width: 0%"></div>
+                </div>
+
+                <div class="p-8 md:p-12">
+                    <div class="flex justify-between items-center mb-6">
+                        <div id="quiz-counter" class="text-sm font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-lg">
+                            Soal 1 dari 10
+                        </div>
+                    </div>
+                    
+                    <h2 id="quiz-question" class="text-2xl font-bold text-slate-800 mb-8 leading-relaxed min-h-[80px]">
+                        Pertanyaan...
+                    </h2>
+
+                    <div id="quiz-options" class="space-y-4">
+                        <!-- Options generated by JS -->
+                    </div>
+
+                    <div class="mt-10 flex justify-between items-center border-t border-slate-100 pt-6">
+                        <button id="btn-prev" onclick="prevQuestion()" class="px-6 py-3 rounded-xl font-semibold transition-all text-slate-300 cursor-not-allowed opacity-50" disabled>
+                            Kembali
+                        </button>
+                        
+                        <button id="btn-next" onclick="nextQuestion()" class="px-8 py-3 rounded-xl font-semibold flex items-center gap-2 transition-all transform active:scale-95 bg-slate-200 text-slate-400 cursor-not-allowed" disabled>
+                            <span id="btn-next-text">Selanjutnya</span> <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </section>
+
+    <section id="view-result" class="view-section flex-col bg-slate-50 pb-12">
+        <header class="bg-white border-b border-slate-200 py-4 px-6 md:px-12 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="p-1.5 bg-blue-100 rounded-lg"><i data-lucide="brain" class="text-blue-600 w-5 h-5"></i></div>
+                <span class="font-bold text-slate-800 text-lg">EduAI Feedback</span>
+            </div>
+            <button onclick="goToStudentHome()" class="text-slate-500 hover:text-red-500 transition-colors flex items-center gap-2 text-sm font-medium">
+                <i data-lucide="log-out" class="w-4 h-4"></i> Keluar
+            </button>
+        </header>
+
+        <main class="max-w-4xl w-full mx-auto mt-8 px-6">
+            <div class="text-center mb-10">
+                <h1 class="text-3xl font-bold text-slate-800 mb-2">Hasil Analisis AI</h1>
+                <p class="text-slate-500">Berdasarkan <span id="result-chapter">Pre-Test Fisika</span> - <span id="res-name" class="font-semibold">Siswa</span></p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-8 text-white flex flex-col justify-center items-center shadow-lg md:col-span-1 text-center relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+                    <p class="text-blue-100 font-medium mb-2 relative z-10">Kemampuan Konsep</p>
+                    <div class="text-6xl font-extrabold mb-2 relative z-10"><span id="res-score">0</span><span class="text-3xl">%</span></div>
+                    <p id="res-status" class="text-sm bg-white/20 py-1 px-4 rounded-full mt-4 font-medium relative z-10 shadow-sm backdrop-blur-sm">Status</p>
+                </div>
+
+                <div class="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 md:col-span-2 flex flex-col justify-center">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="flex items-center gap-2 text-green-600 font-bold mb-3"><i data-lucide="check-circle-2" class="w-5 h-5"></i> Kekuatan</h3>
+                            <ul id="res-strengths" class="list-disc list-inside text-slate-700 space-y-2 text-sm"></ul>
+                        </div>
+                        <div>
+                            <h3 class="flex items-center gap-2 text-orange-500 font-bold mb-3"><i data-lucide="alert-triangle" class="w-5 h-5"></i> Perlu Diperbaiki</h3>
+                            <ul id="res-weaknesses" class="list-disc list-inside text-slate-700 space-y-2 text-sm"></ul>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 pt-6 border-t border-slate-100">
+                        <h3 class="text-slate-800 font-bold mb-2">💡 Rekomendasi AI Personal:</h3>
+                        <p id="res-ai-msg" class="text-slate-600 italic bg-blue-50 p-4 rounded-xl border border-blue-100 leading-relaxed text-sm"></p>
+                        
+                        <div class="mt-6 flex justify-end">
+                            <button onclick="openRecommendedMaterial()" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold shadow-lg shadow-blue-200 transition-all flex items-center gap-2">
+                                Mulai Pembelajaran <i data-lucide="play-circle" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-6 border-t border-slate-100">
+                        <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="message-circle" class="w-5 h-5 text-blue-600"></i> Tanya EduAI</h3>
+                        <form onsubmit="handleStudentChat(event)" class="flex gap-2"><input id="student-chat-input" class="flex-1 px-4 py-3 rounded-xl border border-slate-200 bg-slate-50" placeholder="Kenapa saya perlu belajar topik ini?"><button class="px-4 py-3 bg-blue-600 text-white rounded-xl font-semibold">Tanya</button></form>
+                        <p id="student-chat-response" class="hidden mt-3 bg-blue-50 border border-blue-100 rounded-xl p-4 text-sm text-slate-600"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Map Pre-Test -->
+            <div class="bg-white rounded-2xl p-8 shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold text-slate-800 mb-8 flex items-center gap-2">
+                    <i data-lucide="map" class="w-5 h-5 text-blue-600"></i> Learning Progress Map
+                </h2>
+                <div class="relative">
+                    <div class="absolute top-1/2 left-0 w-full h-1 bg-slate-200 -translate-y-1/2 z-0 hidden md:block"><div class="h-full bg-blue-500 w-1/4"></div></div>
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-6 relative z-10">
+                        <div class="flex flex-col items-center"><div class="w-12 h-12 rounded-full bg-green-500 text-white flex items-center justify-center font-bold shadow-md shadow-green-200 mb-3"><i data-lucide="check-circle-2"></i></div><span class="font-semibold text-slate-800 text-sm">Pre-test</span></div>
+                        <div class="flex flex-col items-center"><div class="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold shadow-md shadow-blue-200 ring-4 ring-white mb-3"><i data-lucide="brain"></i></div><span class="font-bold text-blue-600 text-sm">Analisis AI</span></div>
+                        <div class="flex flex-col items-center"><div class="w-12 h-12 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold mb-3 border-2 border-white">3</div><span class="font-medium text-slate-500 text-sm">Rekomendasi</span></div>
+                        <div class="flex flex-col items-center opacity-50"><div class="w-12 h-12 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold mb-3 border-2 border-white">4</div><span class="font-medium text-slate-500 text-sm">Post-test</span></div>
+                        <div class="flex flex-col items-center opacity-50"><div class="w-12 h-12 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold mb-3 border-2 border-white">5</div><span class="font-medium text-slate-500 text-sm">Evaluasi</span></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </section>
+
+    <section id="view-learning" class="view-section flex-col bg-slate-50 pb-12">
+        <header class="bg-white border-b border-slate-200 py-4 px-6 md:px-12 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="p-1.5 bg-blue-100 rounded-lg"><i data-lucide="book-open" class="text-blue-600 w-5 h-5"></i></div>
+                <span id="learning-header-title" class="font-bold text-slate-800 text-lg">Materi Awal</span>
+            </div>
+            <button onclick="goToStudentHome()" class="text-slate-500 hover:text-red-500 transition-colors flex items-center gap-2 text-sm font-medium">
+                <i data-lucide="log-out" class="w-4 h-4"></i> Keluar
+            </button>
+        </header>
+        <main class="max-w-4xl w-full mx-auto mt-8 px-6">
+            <div class="bg-white rounded-2xl p-8 shadow-sm border border-slate-200">
+                <div class="flex items-center gap-3 mb-6">
+                    <i data-lucide="book-open-text" class="text-blue-500 w-7 h-7"></i>
+                    <h2 id="learning-content-title" class="text-2xl font-bold text-slate-800">Materi Bab</h2>
+                </div>
+                <div id="learning-text-content" class="space-y-5 mb-6"></div>
+
+                <div class="bg-blue-50 border border-blue-100 p-5 rounded-xl mb-8">
+                    <h3 id="learning-instruction-title" class="font-bold text-blue-800 mb-2">Petunjuk Belajar:</h3>
+                    <p id="learning-resource-description" class="text-slate-600 text-sm leading-relaxed">
+                        Tonton simulasi di atas dengan seksama. Perhatikan bagaimana konsep saling berkaitan dan ingat kembali rumus dasar yang telah kamu pelajari. Setelah kamu paham, silakan lanjut ke Post-Test untuk mengukur peningkatanmu.
+                    </p>
+                </div>
+
+                <div class="flex flex-col-reverse sm:flex-row justify-between gap-3 border-t border-slate-100 pt-6">
+                    <button id="learning-back-button" onclick="navigateTo('view-chapters')" class="px-6 py-3 rounded-xl font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors flex items-center justify-center gap-2">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali Pilih Bab
+                    </button>
+                    <button id="learning-action-button" onclick="startQuiz('pre')" class="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-bold shadow-lg shadow-blue-200 transition-all flex items-center gap-2 transform active:scale-95">
+                        Mulai Pre-Test <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+            
+        </main>
+    </section>
+
+    <section id="view-final" class="view-section flex-col bg-slate-50 pb-12">
+        <header class="bg-white border-b border-slate-200 py-4 px-6 md:px-12 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="p-1.5 bg-blue-100 rounded-lg"><i data-lucide="trophy" class="text-blue-600 w-5 h-5"></i></div>
+                <span class="font-bold text-slate-800 text-lg">Evaluasi Akhir AI</span>
+            </div>
+            <button onclick="goToStudentHome()" class="text-slate-500 hover:text-red-500 transition-colors flex items-center gap-2 text-sm font-medium">
+                <i data-lucide="log-out" class="w-4 h-4"></i> Keluar
+            </button>
+        </header>
+
+        <main class="max-w-4xl w-full mx-auto mt-8 px-6">
+            <div class="text-center mb-10">
+                <h1 class="text-3xl font-bold text-slate-800 mb-2">Selamat, Evaluasi Selesai!</h1>
+                <p class="text-slate-500">Inilah hasil perjalanan belajarmu, <span id="final-name" class="font-semibold">Siswa</span></p>
+                <button type="button" onclick="document.getElementById('answer-review-section').scrollIntoView({ behavior: 'smooth' })" class="mt-4 px-4 py-2 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 text-sm font-semibold">Lihat Rekapan Jawaban <span aria-hidden="true">↓</span></button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 text-center flex flex-col justify-center items-center">
+                    <p class="text-slate-500 font-medium mb-2">Pre-Test</p>
+                    <div id="final-pre-score" class="text-5xl font-bold text-slate-700">0%</div>
+                </div>
+
+                <div class="bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl p-6 text-white flex flex-col justify-center items-center shadow-lg relative overflow-hidden transform scale-105 z-10">
+                    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                    <p class="text-green-100 font-medium mb-2">Post-Test Akhir</p>
+                    <div id="final-post-score" class="text-6xl font-extrabold mb-2">0%</div>
+                    <div id="final-improvement" class="flex items-center gap-1 bg-white/20 px-3 py-1 rounded-full text-sm font-medium mt-2">
+                        <i data-lucide="trending-up" class="w-4 h-4"></i> Naik
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-center">
+                    <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="brain" class="text-blue-600 w-5 h-5"></i> Kesimpulan AI</h3>
+                    <p id="final-ai-msg" class="text-sm text-slate-600 leading-relaxed"></p>
+                </div>
+            </div>
+
+            <div id="answer-review-section" class="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 mt-6 mb-8">
+                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">Rekapan Jawaban</h2>
+                        <p class="text-sm text-slate-500 mt-1">Lihat kembali jawabanmu dan pahami alasan di balik setiap jawaban.</p>
+                    </div>
+                    <button type="button" onclick="downloadAnswerReview()" class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold flex items-center gap-2"><i data-lucide="download" class="w-4 h-4"></i> Download Rekapan PDF</button>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
+                    <div class="flex gap-2" role="tablist" aria-label="Pilih rekapan ujian">
+                        <button id="review-tab-pre" type="button" onclick="renderAnswerReview('pre')" class="px-4 py-2 rounded-lg text-sm font-semibold bg-slate-100 text-slate-600">Pre-Test</button>
+                        <button id="review-tab-post" type="button" onclick="renderAnswerReview('post')" class="px-4 py-2 rounded-lg text-sm font-semibold bg-blue-600 text-white">Post-Test</button>
+                    </div>
+                    <div id="review-summary" class="text-sm text-slate-600"></div>
+                </div>
+                <div id="answer-review-list" class="space-y-4"></div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 mt-6">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <i data-lucide="map" class="w-5 h-5 text-blue-600"></i> Learning Progress Map
+                    </h2>
+                            <button onclick="returnToChapterSelection()" class="px-6 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-medium transition-colors flex items-center gap-2">
+                                <i data-lucide="library" class="w-4 h-4"></i> Pilih Materi Lagi
+                    </button>
+                </div>
+                <div class="relative">
+                    <div class="absolute top-1/2 left-0 w-full h-1 bg-slate-200 -translate-y-1/2 z-0 hidden md:block"><div class="h-full bg-green-500 w-full"></div></div>
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-6 relative z-10">
+                        <div class="flex flex-col items-center"><div class="w-12 h-12 rounded-full bg-green-500 text-white flex items-center justify-center font-bold shadow-md shadow-green-200 mb-3"><i data-lucide="check-circle-2"></i></div><span class="font-semibold text-slate-800 text-sm">Pre-test</span></div>
+                        <div class="flex flex-col items-center"><div class="w-12 h-12 rounded-full bg-green-500 text-white flex items-center justify-center font-bold shadow-md shadow-green-200 mb-3"><i data-lucide="check-circle-2"></i></div><span class="font-semibold text-slate-800 text-sm">Analisis AI</span></div>
+                        <div class="flex flex-col items-center"><div class="w-12 h-12 rounded-full bg-green-500 text-white flex items-center justify-center font-bold shadow-md shadow-green-200 mb-3"><i data-lucide="check-circle-2"></i></div><span class="font-semibold text-slate-800 text-sm">Rekomendasi</span></div>
+                        <div class="flex flex-col items-center"><div class="w-12 h-12 rounded-full bg-green-500 text-white flex items-center justify-center font-bold shadow-md shadow-green-200 mb-3"><i data-lucide="check-circle-2"></i></div><span class="font-semibold text-slate-800 text-sm">Post-test</span></div>
+                        <div class="flex flex-col items-center"><div class="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold shadow-md shadow-blue-200 ring-4 ring-white mb-3"><i data-lucide="trophy"></i></div><span class="font-bold text-blue-600 text-sm">Evaluasi</span></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </section>
+
+    <section id="view-teacher" class="view-section flex h-screen overflow-hidden bg-slate-50">
+        <!-- Sidebar Desktop -->
+        <div class="w-64 h-screen shrink-0 bg-white border-r border-slate-200 flex-col shadow-sm hidden md:flex">
+            <div class="p-6 flex items-center gap-3">
+                <div class="p-2 bg-blue-100 rounded-lg"><i data-lucide="brain" class="text-blue-600 w-6 h-6"></i></div>
+                <span class="text-xl font-bold text-slate-800">EduAI Insight</span>
+            </div>
+            
+            <nav class="flex-1 px-4 py-4 space-y-2">
+                <button onclick="setTeacherMenu('dashboard')" id="menu-dashboard" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-left bg-blue-50 text-blue-700 font-medium">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
+                </button>
+                <button onclick="setTeacherMenu('ai')" id="menu-ai" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-left text-slate-500 hover:bg-slate-50 hover:text-slate-700">
+                    <i data-lucide="brain" class="w-5 h-5"></i> AI Recommendation
+                </button>
+                <button onclick="setTeacherMenu('analytics')" id="menu-analytics" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-left text-slate-500 hover:bg-slate-50 hover:text-slate-700">
+                    <i data-lucide="bar-chart-3" class="w-5 h-5"></i> Student Analytics
+                </button>
+                <button onclick="setTeacherMenu('progress')" id="menu-progress" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-left text-slate-500 hover:bg-slate-50 hover:text-slate-700">
+                    <i data-lucide="route" class="w-5 h-5"></i> Learning Progress
+                </button>
+            </nav>
+
+            <div class="p-4 border-t border-slate-200">
+                <button onclick="navigateTo('view-landing')" class="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl transition-colors font-medium">
+                    <i data-lucide="log-out" class="w-5 h-5"></i> Keluar
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 min-w-0 h-screen overflow-y-auto bg-slate-50/50">
+            <div class="p-6 md:p-8">
+                <div class="mb-8 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+                    <h2 id="teacher-view-title" class="text-2xl font-bold text-slate-800">Dashboard</h2>
+                    <div class="flex items-center justify-between md:justify-end gap-4">
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm text-slate-500 hidden sm:block">T.A. 2026/2027</span>
+                            <div class="w-10 h-10 rounded-full bg-blue-200 flex items-center justify-center text-blue-700 font-bold border-2 border-white shadow-sm">GR</div>
+                        </div>
+                        <button onclick="navigateTo('view-landing')" class="md:hidden flex items-center gap-2 px-3 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-colors text-sm font-medium border border-red-100">
+                            <i data-lucide="log-out" class="w-4 h-4"></i> Keluar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Teacher: Dashboard View -->
+                <div id="teacher-sub-dashboard" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex justify-between items-start">
+                            <div><p class="text-sm text-slate-500 mb-1">Total Siswa</p><h3 id="stat-total" class="text-3xl font-bold text-slate-800">120</h3></div>
+                            <div class="p-3 bg-blue-50 rounded-lg text-blue-600"><i data-lucide="users" class="w-6 h-6"></i></div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex justify-between items-start">
+                            <div><p class="text-sm text-slate-500 mb-1">Rata-rata Pemahaman</p><h3 id="stat-average" class="text-3xl font-bold text-slate-800">0%</h3></div>
+                            <div class="p-3 bg-green-50 rounded-lg text-green-600"><i data-lucide="activity" class="w-6 h-6"></i></div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex justify-between items-start">
+                            <div><p class="text-sm text-slate-500 mb-1">Butuh Intervensi</p><h3 id="stat-intervention" class="text-3xl font-bold text-red-500">0</h3></div>
+                            <div class="p-3 bg-red-50 rounded-lg text-red-500"><i data-lucide="alert-triangle" class="w-6 h-6"></i></div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex justify-between items-start">
+                            <div><p class="text-sm text-slate-500 mb-1">Materi Tersulit</p><h3 id="stat-hardest" class="text-lg font-bold text-slate-800 mt-2 leading-tight">-</h3></div>
+                            <div class="p-3 bg-purple-50 rounded-lg text-purple-600"><i data-lucide="book-open" class="w-6 h-6"></i></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                            <h3 class="text-lg font-semibold text-slate-800 mb-4">Perkembangan Nilai Siswa</h3>
+                            <div class="h-64"><canvas id="lineChart"></canvas></div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                            <h3 class="text-lg font-semibold text-slate-800 mb-4">Tingkat Pemahaman Materi</h3>
+                            <div class="h-64"><canvas id="barChart"></canvas></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                        <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                            <div>
+                                <h3 class="text-lg font-semibold text-slate-800">Student Risk Prediction (AI Analysis)</h3>
+                                <p class="text-sm text-slate-500 mt-1">Daftar siswa berdasarkan tingkat pemahaman dan rekomendasi intervensi.</p>
+                            </div>
+                            <span class="px-3 py-1 bg-green-50 text-green-600 text-xs font-semibold rounded-full border border-green-200 animate-pulse">Live Auto-Sync</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="px-6 py-4 text-sm font-medium text-slate-500">Nama Siswa</th>
+                                        <th class="px-6 py-4 text-sm font-medium text-slate-500">Pre-Test</th>
+                                        <th class="px-6 py-4 text-sm font-medium text-slate-500">Post-Test</th>
+                                        <th class="px-6 py-4 text-sm font-medium text-slate-500">Status Awal</th>
+                                        <th class="px-6 py-4 text-sm font-medium text-slate-500">Rekomendasi AI</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="student-table-body" class="divide-y divide-slate-100">
+                                    <!-- Table Rows Generated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="teacher-sub-analytics" class="hidden space-y-6">
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                        <h3 class="text-lg font-semibold text-slate-800">Student Analytics</h3>
+                        <p class="text-sm text-slate-500 mt-1">Pilih siswa untuk meninjau insight AI dan alasan rekomendasinya.</p>
+                        <div id="analytics-student-list" class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-5"></div>
+                    </div>
+                    <div id="analytics-detail" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100"><p class="text-slate-500">Pilih siswa untuk melihat detail analitik.</p></div>
+                </div>
+
+                <div id="teacher-sub-progress" class="hidden space-y-6">
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5"><div><h3 class="text-lg font-semibold text-slate-800">Learning Progress per Bab</h3><p class="text-sm text-slate-500 mt-1">Pilih siswa untuk melihat riwayat belajarnya.</p></div><button onclick="downloadTeacherReport()" class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold flex items-center gap-2"><i data-lucide="download" class="w-4 h-4"></i> Download Laporan</button></div>
+                        <div id="progress-list" class="space-y-4"></div>
+                    </div>
+                    <div id="teacher-progress-detail" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100"><p class="text-slate-500">Pilih siswa untuk melihat detail progres per bab.</p></div>
+                </div>
+
+                <!-- Teacher: AI Rec View -->
+                <div id="teacher-sub-ai" class="hidden h-[500px] bg-white rounded-2xl shadow-sm border border-slate-100 flex-col">
+                    <div class="p-4 border-b border-slate-100 flex items-center gap-3 bg-slate-50 rounded-t-2xl">
+                        <div class="p-2 bg-blue-100 text-blue-600 rounded-lg"><i data-lucide="message-square" class="w-5 h-5"></i></div>
+                        <div>
+                            <h3 class="font-semibold text-slate-800">EduAI Assistant</h3>
+                            <p class="text-xs text-green-500 font-medium flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span> Online</p>
+                        </div>
+                    </div>
+                    
+                    <div id="chat-history" class="flex-1 overflow-y-auto p-6 space-y-4">
+                        <div class="flex justify-start">
+                            <div class="max-w-[75%] p-4 rounded-2xl bg-slate-100 text-slate-700 rounded-tl-none border border-slate-200">
+                                <p class="text-sm leading-relaxed">Halo! Saya EduAI Assistant. Ada yang bisa saya bantu terkait analisis performa siswa kelas Anda hari ini?</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form onsubmit="handleChatSubmit(event)" class="p-4 border-t border-slate-100 bg-white rounded-b-2xl flex gap-2">
+                        <input type="text" id="chat-input" placeholder="Tanya AI tentang analisis kelas (coba ketik 'listrik')..." class="flex-1 px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-slate-50">
+                        <button type="submit" class="p-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center shadow-md shadow-blue-200">
+                            <i data-lucide="send" class="w-5 h-5"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Database & States
+        const usersDb = {};
+        const storageKey = 'eduai-insight-prototype-data';
+        const materialFiles = {
+            'Kelas X': { title: 'Materi Fisika Kelas X', file: 'BUku%20Fisika%20Kelas%2010.pdf' },
+            'Kelas XI': { title: 'Materi Fisika Kelas XI', file: 'Buku%20Fisika%20Kelas%2011.pdf' },
+            'Kelas XII': { title: 'Materi Fisika Kelas XII', file: 'Buku%20Fisika%20Kelas%2012.pdf' }
+        };
+        const chapterPdfLinks = {
+            'Kelas X': {
+                'bab-1': 'Buku%20Fisika%20Kelas%2010%20-%20Bab%201.pdf',
+                'bab-2': 'Buku%20Fisika%20Kelas%2010%20-%20Bab%202.pdf',
+                'bab-3': 'Buku%20Fisika%20Kelas%2010%20-%20Bab%203.pdf'
+            }
+        };
+        const learningResources = {
+            Mekanika: { title: 'Mekanika dan Gerak Lurus', type: 'Simulasi konsep', description: 'Visualisasi hubungan posisi, waktu, dan kecepatan.' },
+            'Newton dan Gaya': { title: 'Newton dan Gaya', type: 'Video interaktif', description: 'Eksperimen virtual gaya, massa, dan percepatan.' },
+            Gelombang: { title: 'Gelombang Elektromagnetik', type: 'Simulasi visual', description: 'Kenali karakteristik gelombang melalui animasi interaktif.' },
+            Listrik: { title: 'Listrik dan Arus DC', type: 'Laboratorium virtual', description: 'Rangkai sirkuit sederhana dan amati beda potensial.' },
+            Energi: { title: 'Energi dalam Kehidupan', type: 'Modul konsep', description: 'Hubungkan energi potensial dan kinetik dengan contoh sehari-hari.' },
+            Optik: { title: 'Optik dan Pembentukan Bayangan', type: 'Simulasi visual', description: 'Eksplorasi cermin, lensa, dan sifat bayangan.' },
+            Kalor: { title: 'Kalor dan Perpindahannya', type: 'Eksperimen virtual', description: 'Bandingkan konduksi, konveksi, dan radiasi.' },
+            Vektor: { title: 'Vektor dalam Fisika', type: 'Latihan konseptual', description: 'Latih pemahaman nilai dan arah besaran fisika.' }
+        };
+        const lessonContent = {
+            Mekanika: { title: 'Mekanika dan Gerak Lurus', text: 'Gerak lurus adalah perpindahan benda pada lintasan garis lurus. Kecepatan menyatakan perubahan posisi tiap satuan waktu, sedangkan percepatan menyatakan perubahan kecepatan tiap satuan waktu.' },
+            'Newton dan Gaya': { title: 'Newton dan Gaya', text: 'Gaya dapat mengubah gerak benda. Hukum I Newton menjelaskan kelembaman, Hukum II Newton menghubungkan gaya, massa, dan percepatan, sedangkan Hukum III Newton menjelaskan pasangan aksi dan reaksi.' },
+            Gelombang: { title: 'Gelombang', text: 'Gelombang adalah getaran yang merambat dan membawa energi. Gelombang elektromagnetik dapat merambat tanpa medium, termasuk di ruang hampa.' },
+            Optik: { title: 'Optik dan Pembentukan Bayangan', text: 'Cahaya dapat dipantulkan dan dibiaskan. Cermin datar membentuk bayangan maya, tegak, dan sama besar dengan benda.' },
+            Vektor: { title: 'Vektor dalam Fisika', text: 'Besaran vektor memiliki nilai dan arah. Penjumlahan vektor dapat dilakukan dengan metode segitiga, jajargenjang, atau menguraikannya ke dalam komponen.' },
+            Energi: { title: 'Energi', text: 'Energi adalah kemampuan untuk melakukan usaha. Energi potensial dipengaruhi kedudukan benda, sedangkan energi kinetik dipengaruhi massa dan kecepatan benda.' },
+            Listrik: { title: 'Listrik dan Arus DC', text: 'Arus listrik adalah aliran muatan listrik. Tegangan mendorong muatan bergerak dalam rangkaian, sedangkan hambatan mengatur besar arus yang mengalir.' },
+            Kalor: { title: 'Kalor dan Perpindahannya', text: 'Kalor berpindah dari benda bersuhu tinggi ke benda bersuhu rendah melalui konduksi, konveksi, atau radiasi.' }
+        };
+        const competencyLessons = {
+            'Besaran Pokok dan Satuan SI': {
+                title: 'Besaran Pokok dan Satuan SI',
+                explanation: 'Besaran pokok adalah besaran yang satuannya ditetapkan terlebih dahulu. Tujuh besaran pokok SI adalah panjang (meter), massa (kilogram), waktu (sekon), kuat arus (ampere), suhu (kelvin), jumlah zat (mol), dan intensitas cahaya (kandela).'
+            },
+            'Besaran Turunan': {
+                title: 'Besaran Turunan',
+                explanation: 'Besaran turunan diperoleh dari kombinasi beberapa besaran pokok. Contohnya luas = panjang x lebar dengan satuan m2, kecepatan = jarak / waktu dengan satuan m/s, dan gaya = massa x percepatan dengan satuan newton (N).'
+            },
+            'Dimensi Besaran': {
+                title: 'Dimensi Besaran',
+                explanation: 'Dimensi menunjukkan susunan suatu besaran dari besaran pokok. Panjang berdimensi [L], massa [M], dan waktu [T]. Kecepatan berdimensi [L][T]^-1, percepatan [L][T]^-2, sedangkan gaya [M][L][T]^-2.'
+            },
+            'Alat Ukur': {
+                title: 'Alat Ukur',
+                explanation: 'Pemilihan alat ukur bergantung pada benda dan ketelitian yang dibutuhkan. Mistar digunakan untuk panjang sederhana, jangka sorong untuk panjang, diameter, dan kedalaman, sedangkan mikrometer sekrup untuk benda yang sangat tipis atau kecil.'
+            },
+            'Besaran Vektor dan Skalar': {
+                title: 'Besaran Vektor dan Skalar',
+                explanation: 'Besaran skalar hanya memiliki nilai, seperti massa, waktu, suhu, jarak, dan kelajuan. Besaran vektor memiliki nilai sekaligus arah, seperti perpindahan, kecepatan, percepatan, dan gaya.'
+            }
+        };
+        const classMaterials = {
+            'Kelas X': [
+                { id: 'bab-1', title: 'Bab 1: Besaran dan Satuan', description: 'Uji pemahaman tentang besaran, satuan, dan pengukuran.', topics: ['Vektor'], icon: 'ruler' },
+                { id: 'bab-2', title: 'Bab 2: Gerak Lurus', description: 'Uji pemahaman tentang posisi, kecepatan, dan gerak lurus.', topics: ['Mekanika'], icon: 'move' },
+                { id: 'bab-3', title: 'Bab 3: Gerak Melingkar Beraturan', description: 'Uji pemahaman tentang gaya dan perubahan gerak benda.', topics: ['Newton dan Gaya'], icon: 'rotate-cw' }
+            ],
+            'Kelas XI': [
+                { id: 'bab-1', title: 'Bab 1: Vektor', description: 'Uji pemahaman tentang nilai, arah, dan operasi vektor.', topics: ['Vektor'], icon: 'move-diagonal' },
+                { id: 'bab-2', title: 'Bab 2: Kinematika', description: 'Uji pemahaman tentang posisi, kecepatan, dan gerak.', topics: ['Mekanika'], icon: 'move' },
+                { id: 'bab-3', title: 'Bab 3: Dinamika Gerak Partikel', description: 'Uji pemahaman tentang gaya dan gerak partikel.', topics: ['Newton dan Gaya'], icon: 'orbit' }
+            ],
+            'Kelas XII': [
+                { id: 'bab-1', title: 'Bab 1: Gelombang', description: 'Uji pemahaman tentang sifat dan karakteristik gelombang.', topics: ['Gelombang'], icon: 'waves' },
+                { id: 'bab-2', title: 'Bab 2: Cahaya', description: 'Uji pemahaman tentang cahaya dan pembentukan bayangan.', topics: ['Optik'], icon: 'sun' },
+                { id: 'bab-3', title: 'Bab 3: Elektrostatika', description: 'Uji pemahaman tentang arus dan besaran listrik.', topics: ['Listrik'], icon: 'zap' }
+            ]
+        };
+        let allStudentsData = [
+            { id: 1, name: 'Andi Pratama', kelas: 'Kelas X', preScore: 65, postScore: 85, topicScores: { Mekanika: 75, 'Newton dan Gaya': 50, Gelombang: 40, Listrik: 100, Energi: 50, Optik: 100, Kalor: 100, Vektor: 50 }, status: 'Perlu Pendampingan', rec: 'Review Gelombang dan latihan remedial', attendance: 92, lmsEngagement: 'High', counselingRecord: 'None', extracurricular: 'Active' },
+            { id: 2, name: 'Budi Santoso', kelas: 'Kelas XI', preScore: 90, postScore: 95, topicScores: { Mekanika: 100, 'Newton dan Gaya': 100, Gelombang: 100, Listrik: 100, Energi: 100, Optik: 100, Kalor: 100, Vektor: 100 }, status: 'Sangat Baik', rec: 'Materi pengayaan dan soal HOTS', attendance: 98, lmsEngagement: 'High', counselingRecord: 'None', extracurricular: 'Active' },
+            { id: 3, name: 'Citra Kirana', kelas: 'Kelas XII', preScore: 72, postScore: 88, topicScores: { Mekanika: 75, 'Newton dan Gaya': 50, Gelombang: 100, Listrik: 100, Energi: 50, Optik: 100, Kalor: 100, Vektor: 50 }, status: 'Cukup', rec: 'Latihan Newton dan Energi', attendance: 88, lmsEngagement: 'Medium', counselingRecord: 'None', extracurricular: 'Active' },
+            { id: 4, name: 'Dina Amelia', kelas: 'Kelas X', preScore: 58, postScore: 75, topicScores: { Mekanika: 50, 'Newton dan Gaya': 50, Gelombang: 40, Listrik: 0, Energi: 50, Optik: 0, Kalor: 100, Vektor: 50 }, status: 'Perlu Pendampingan', rec: 'Mulai dari Listrik dan Optik', attendance: 81, lmsEngagement: 'Low', counselingRecord: 'Follow-up', extracurricular: 'Active' },
+        ];
+        
+        let activeEmail = '';
+        let activeStudent = null;
+        let isSignUp = false;
+        let testMode = 'pre'; // 'pre' or 'post'
+        let selectedChapter = null;
+        let learningMode = 'intro';
+        let activeQuizQuestions = [];
+        let currentRoute = 'view-landing';
+
+        // Questions Data
+        const questions = [
+            { id: 'x-bab1-1', kelas: 'Kelas X', chapterId: 'bab-1', topic: 'Besaran dan Satuan', competency: 'Besaran Vektor dan Skalar', difficulty: 'easy', text: 'Besaran fisika yang memiliki nilai sekaligus arah disebut...', options: [{id:'a', t:'Besaran Pokok'}, {id:'b', t:'Besaran Turunan'}, {id:'c', t:'Besaran Vektor'}, {id:'d', t:'Besaran Skalar'}], ans: 'c' },
+            { id: 'x-bab1-2', kelas: 'Kelas X', chapterId: 'bab-1', topic: 'Besaran dan Satuan', competency: 'Besaran Pokok dan Satuan SI', difficulty: 'easy', text: 'Manakah yang termasuk besaran pokok dalam SI?', options: [{id:'a', t:'Luas'}, {id:'b', t:'Kecepatan'}, {id:'c', t:'Massa'}, {id:'d', t:'Gaya'}], ans: 'c' },
+            { id: 'x-bab1-3', kelas: 'Kelas X', chapterId: 'bab-1', topic: 'Besaran dan Satuan', competency: 'Besaran Pokok dan Satuan SI', difficulty: 'easy', text: 'Satuan SI untuk panjang adalah...', options: [{id:'a', t:'Centimeter'}, {id:'b', t:'Kilometer'}, {id:'c', t:'Meter'}, {id:'d', t:'Milimeter'}], ans: 'c' },
+            { id: 'x-bab1-4', kelas: 'Kelas X', chapterId: 'bab-1', topic: 'Besaran dan Satuan', competency: 'Besaran Turunan', difficulty: 'easy', text: 'Besaran yang diperoleh dari kombinasi beberapa besaran pokok disebut...', options: [{id:'a', t:'Besaran skalar'}, {id:'b', t:'Besaran turunan'}, {id:'c', t:'Besaran vektor'}, {id:'d', t:'Besaran standar'}], ans: 'b' },
+            { id: 'x-bab1-5', kelas: 'Kelas X', chapterId: 'bab-1', topic: 'Besaran dan Satuan', competency: 'Dimensi Besaran', difficulty: 'medium', text: 'Dimensi dari kecepatan adalah...', options: [{id:'a', t:'[L][T]^-1'}, {id:'b', t:'[L][T]^-2'}, {id:'c', t:'[M][L][T]^-2'}, {id:'d', t:'[M][L]^2[T]^-2'}], ans: 'a' },
+            { id: 'x-bab1-6', kelas: 'Kelas X', chapterId: 'bab-1', topic: 'Besaran dan Satuan', competency: 'Alat Ukur', difficulty: 'medium', text: 'Alat yang paling tepat digunakan untuk mengukur diameter luar dan diameter dalam sebuah benda adalah...', options: [{id:'a', t:'Mistar'}, {id:'b', t:'Jangka sorong'}, {id:'c', t:'Stopwatch'}, {id:'d', t:'Neraca'}], ans: 'b' },
+            { id: 'x-bab1-7', kelas: 'Kelas X', chapterId: 'bab-1', topic: 'Besaran dan Satuan', competency: 'Alat Ukur', difficulty: 'easy', text: 'Mikrometer sekrup digunakan untuk mengukur...', options: [{id:'a', t:'Waktu'}, {id:'b', t:'Massa'}, {id:'c', t:'Ketebalan benda yang sangat tipis'}, {id:'d', t:'Suhu'}], ans: 'c' },
+            { id: 'x-bab1-8', kelas: 'Kelas X', chapterId: 'bab-1', topic: 'Besaran dan Satuan', competency: 'Besaran Pokok dan Satuan SI', difficulty: 'easy', text: 'Satuan SI dari massa adalah...', options: [{id:'a', t:'Gram'}, {id:'b', t:'Kilogram'}, {id:'c', t:'Ton'}, {id:'d', t:'Miligram'}], ans: 'b' },
+            { id: 'x-bab1-9', kelas: 'Kelas X', chapterId: 'bab-1', topic: 'Besaran dan Satuan', competency: 'Besaran Turunan', difficulty: 'easy', text: 'Manakah yang merupakan contoh besaran turunan?', options: [{id:'a', t:'Waktu'}, {id:'b', t:'Suhu'}, {id:'c', t:'Panjang'}, {id:'d', t:'Kecepatan'}], ans: 'd' },
+            { id: 'x-bab1-10', kelas: 'Kelas X', chapterId: 'bab-1', topic: 'Besaran dan Satuan', competency: 'Besaran Vektor dan Skalar', difficulty: 'easy', text: 'Besaran yang hanya memiliki nilai tanpa memiliki arah disebut...', options: [{id:'a', t:'Besaran vektor'}, {id:'b', t:'Besaran skalar'}, {id:'c', t:'Besaran pokok'}, {id:'d', t:'Besaran dimensi'}], ans: 'b' },
+            { id: 'x-bab2-1', kelas: 'Kelas X', chapterId: 'bab-2', topic: 'Gerak Lurus', competency: 'Kedudukan', difficulty: 'easy', text: 'Kedudukan suatu benda dalam gerak lurus menyatakan...', options: [{id:'a', t:'Letak benda terhadap titik acuan'}, {id:'b', t:'Panjang seluruh lintasan'}, {id:'c', t:'Perubahan kecepatan tiap waktu'}, {id:'d', t:'Waktu untuk menempuh lintasan'}], ans: 'a' },
+            { id: 'x-bab2-2', kelas: 'Kelas X', chapterId: 'bab-2', topic: 'Gerak Lurus', competency: 'Jarak', difficulty: 'easy', text: 'Jarak adalah...', options: [{id:'a', t:'Perubahan posisi dari awal ke akhir'}, {id:'b', t:'Panjang lintasan yang ditempuh'}, {id:'c', t:'Perubahan kecepatan'}, {id:'d', t:'Arah gerak benda'}], ans: 'b' },
+            { id: 'x-bab2-3', kelas: 'Kelas X', chapterId: 'bab-2', topic: 'Gerak Lurus', competency: 'Perpindahan', difficulty: 'easy', text: 'Perpindahan merupakan...', options: [{id:'a', t:'Besaran skalar tanpa arah'}, {id:'b', t:'Panjang lintasan seluruhnya'}, {id:'c', t:'Perubahan kedudukan dari awal ke akhir'}, {id:'d', t:'Hasil kali jarak dan waktu'}], ans: 'c' },
+            { id: 'x-bab2-4', kelas: 'Kelas X', chapterId: 'bab-2', topic: 'Gerak Lurus', competency: 'Kelajuan', difficulty: 'easy', text: 'Kelajuan rata-rata dihitung dengan membagi...', options: [{id:'a', t:'Perpindahan dengan waktu'}, {id:'b', t:'Jarak dengan waktu'}, {id:'c', t:'Waktu dengan jarak'}, {id:'d', t:'Kecepatan dengan waktu'}], ans: 'b' },
+            { id: 'x-bab2-5', kelas: 'Kelas X', chapterId: 'bab-2', topic: 'Gerak Lurus', competency: 'Kecepatan', difficulty: 'medium', text: 'Kecepatan rata-rata adalah perbandingan antara...', options: [{id:'a', t:'Jarak dan waktu'}, {id:'b', t:'Perpindahan dan waktu'}, {id:'c', t:'Waktu dan perpindahan'}, {id:'d', t:'Percepatan dan waktu'}], ans: 'b' },
+            { id: 'x-bab2-6', kelas: 'Kelas X', chapterId: 'bab-2', topic: 'Gerak Lurus', competency: 'Percepatan', difficulty: 'medium', text: 'Percepatan menyatakan perubahan ... tiap satuan waktu.', options: [{id:'a', t:'Kedudukan'}, {id:'b', t:'Jarak'}, {id:'c', t:'Kecepatan'}, {id:'d', t:'Massa'}], ans: 'c' },
+            { id: 'x-bab2-7', kelas: 'Kelas X', chapterId: 'bab-2', topic: 'Gerak Lurus', competency: 'GLB', difficulty: 'easy', text: 'Ciri utama gerak lurus beraturan adalah...', options: [{id:'a', t:'Kecepatan tetap'}, {id:'b', t:'Percepatan tetap dan tidak nol'}, {id:'c', t:'Lintasan melingkar'}, {id:'d', t:'Kecepatan selalu bertambah'}], ans: 'a' },
+            { id: 'x-bab2-8', kelas: 'Kelas X', chapterId: 'bab-2', topic: 'Gerak Lurus', competency: 'GLBB', difficulty: 'medium', text: 'Pada gerak lurus berubah beraturan, benda memiliki...', options: [{id:'a', t:'Kecepatan tetap'}, {id:'b', t:'Percepatan tetap'}, {id:'c', t:'Jarak tetap'}, {id:'d', t:'Kedudukan tetap'}], ans: 'b' },
+            { id: 'x-bab2-9', kelas: 'Kelas X', chapterId: 'bab-2', topic: 'Gerak Lurus', competency: 'Gerak Jatuh Bebas', difficulty: 'medium', text: 'Gerak jatuh bebas adalah gerak benda yang...', options: [{id:'a', t:'Dipengaruhi gaya gravitasi saja'}, {id:'b', t:'Memiliki kecepatan tetap ke atas'}, {id:'c', t:'Bergerak tanpa percepatan'}, {id:'d', t:'Selalu bergerak mendatar'}], ans: 'a' },
+            { id: 'x-bab2-10', kelas: 'Kelas X', chapterId: 'bab-2', topic: 'Gerak Lurus', competency: 'Gerak Vertikal ke Atas', difficulty: 'medium', text: 'Saat benda bergerak vertikal ke atas, kecepatannya...', options: [{id:'a', t:'Bertambah karena gravitasi'}, {id:'b', t:'Tetap sepanjang gerak'}, {id:'c', t:'Berkurang hingga nol di titik tertinggi'}, {id:'d', t:'Langsung berubah arah tanpa berhenti'}], ans: 'c' },
+            { id: 'x-bab3-1', kelas: 'Kelas X', chapterId: 'bab-3', topic: 'Gerak Melingkar Beraturan', competency: 'Pengertian GMB', difficulty: 'easy', text: 'Gerak melingkar beraturan adalah gerak benda pada lintasan lingkaran dengan...', options: [{id:'a', t:'Kelajuan tetap'}, {id:'b', t:'Percepatan nol'}, {id:'c', t:'Jari-jari berubah'}, {id:'d', t:'Arah kecepatan tetap'}], ans: 'a' },
+            { id: 'x-bab3-2', kelas: 'Kelas X', chapterId: 'bab-3', topic: 'Gerak Melingkar Beraturan', competency: 'Periode', difficulty: 'easy', text: 'Periode adalah waktu yang diperlukan benda untuk...', options: [{id:'a', t:'Menempuh setengah lingkaran'}, {id:'b', t:'Menempuh satu putaran penuh'}, {id:'c', t:'Berhenti sesaat'}, {id:'d', t:'Mengubah arah satu kali'}], ans: 'b' },
+            { id: 'x-bab3-3', kelas: 'Kelas X', chapterId: 'bab-3', topic: 'Gerak Melingkar Beraturan', competency: 'Frekuensi', difficulty: 'easy', text: 'Frekuensi menyatakan banyaknya ... tiap satuan waktu.', options: [{id:'a', t:'Jarak'}, {id:'b', t:'Percepatan'}, {id:'c', t:'Putaran'}, {id:'d', t:'Gaya'}], ans: 'c' },
+            { id: 'x-bab3-4', kelas: 'Kelas X', chapterId: 'bab-3', topic: 'Gerak Melingkar Beraturan', competency: 'Kecepatan Sudut', difficulty: 'medium', text: 'Kecepatan sudut menyatakan perubahan ... tiap satuan waktu.', options: [{id:'a', t:'Sudut'}, {id:'b', t:'Jari-jari'}, {id:'c', t:'Massa'}, {id:'d', t:'Keliling'}], ans: 'a' },
+            { id: 'x-bab3-5', kelas: 'Kelas X', chapterId: 'bab-3', topic: 'Gerak Melingkar Beraturan', competency: 'Kecepatan Tangensial', difficulty: 'medium', text: 'Arah kecepatan tangensial pada suatu titik lintasan adalah...', options: [{id:'a', t:'Menuju pusat lingkaran'}, {id:'b', t:'Menjauhi pusat lingkaran'}, {id:'c', t:'Menyinggung lintasan'}, {id:'d', t:'Sejajar jari-jari'}], ans: 'c' },
+            { id: 'x-bab3-6', kelas: 'Kelas X', chapterId: 'bab-3', topic: 'Gerak Melingkar Beraturan', competency: 'Percepatan Sentripetal', difficulty: 'medium', text: 'Percepatan sentripetal selalu berarah...', options: [{id:'a', t:'Menjauhi pusat'}, {id:'b', t:'Menuju pusat'}, {id:'c', t:'Sepanjang garis singgung'}, {id:'d', t:'Berlawanan kecepatan sudut'}], ans: 'b' },
+            { id: 'x-bab3-7', kelas: 'Kelas X', chapterId: 'bab-3', topic: 'Gerak Melingkar Beraturan', competency: 'Hubungan Sudut dan Tangensial', difficulty: 'medium', text: 'Hubungan antara kecepatan tangensial v dan kecepatan sudut omega adalah...', options: [{id:'a', t:'v = omega / r'}, {id:'b', t:'v = omega r'}, {id:'c', t:'v = r / omega'}, {id:'d', t:'v = omega + r'}], ans: 'b' },
+            { id: 'x-bab3-8', kelas: 'Kelas X', chapterId: 'bab-3', topic: 'Gerak Melingkar Beraturan', competency: 'Percepatan Sentripetal', difficulty: 'medium', text: 'Jika kelajuan tetap tetapi jari-jari lintasan diperkecil, percepatan sentripetal akan...', options: [{id:'a', t:'Berkurang'}, {id:'b', t:'Tetap'}, {id:'c', t:'Bertambah'}, {id:'d', t:'Menjadi nol'}], ans: 'c' },
+            { id: 'x-bab3-9', kelas: 'Kelas X', chapterId: 'bab-3', topic: 'Gerak Melingkar Beraturan', competency: 'Roda Bersinggungan', difficulty: 'medium', text: 'Dua roda bersinggungan tanpa slip memiliki ... pada titik singgung.', options: [{id:'a', t:'Kecepatan tangensial sama'}, {id:'b', t:'Jari-jari sama'}, {id:'c', t:'Kecepatan sudut sama'}, {id:'d', t:'Periode selalu berbeda'}], ans: 'a' },
+            { id: 'x-bab3-10', kelas: 'Kelas X', chapterId: 'bab-3', topic: 'Gerak Melingkar Beraturan', competency: 'Hubungan Roda', difficulty: 'medium', text: 'Pada dua roda yang dihubungkan sabuk tanpa slip, besaran yang sama adalah...', options: [{id:'a', t:'Kecepatan tangensial'}, {id:'b', t:'Kecepatan sudut'}, {id:'c', t:'Jari-jari'}, {id:'d', t:'Percepatan sentripetal'}], ans: 'a' }
+        ];
+
+        const questionExplanations = {
+            'Besaran Vektor dan Skalar': 'Besaran vektor memiliki nilai dan arah, sedangkan besaran skalar hanya memiliki nilai.',
+            'Besaran Pokok dan Satuan SI': 'Besaran pokok dan satuan SI menjadi dasar pengukuran fisika, seperti massa dalam kilogram dan panjang dalam meter.',
+            'Besaran Turunan': 'Besaran turunan diperoleh dari kombinasi besaran pokok, misalnya kecepatan dalam meter per sekon.',
+            'Dimensi Besaran': 'Dimensi menunjukkan susunan suatu besaran dari besaran pokok, seperti kecepatan yang berdimensi [L][T]^-1.',
+            'Alat Ukur': 'Alat ukur dipilih berdasarkan jenis benda dan ketelitian yang diperlukan, seperti jangka sorong dan mikrometer sekrup.',
+            Kedudukan: 'Kedudukan menyatakan letak benda terhadap titik acuan tertentu.',
+            Jarak: 'Jarak adalah panjang seluruh lintasan yang ditempuh dan merupakan besaran skalar.',
+            Perpindahan: 'Perpindahan adalah perubahan kedudukan dari titik awal ke titik akhir dan memiliki arah.',
+            Kelajuan: 'Kelajuan rata-rata adalah jarak total dibagi waktu total.',
+            Kecepatan: 'Kecepatan rata-rata adalah perpindahan dibagi waktu dan memiliki arah.',
+            Percepatan: 'Percepatan menyatakan perubahan kecepatan setiap satuan waktu.',
+            GLB: 'Pada GLB, benda bergerak lurus dengan kecepatan tetap dan percepatan nol.',
+            GLBB: 'Pada GLBB, benda bergerak dengan percepatan tetap sehingga kecepatannya berubah teratur.',
+            'Gerak Jatuh Bebas': 'Gerak jatuh bebas hanya dipengaruhi gravitasi dan memiliki percepatan menuju bumi.',
+            'Gerak Vertikal ke Atas': 'Saat bergerak ke atas, benda mengalami perlambatan gravitasi hingga kecepatannya nol di titik tertinggi.',
+            'Pengertian GMB': 'Gerak melingkar beraturan memiliki lintasan lingkaran dan kelajuan tetap, meskipun arah kecepatannya berubah.',
+            Periode: 'Periode adalah waktu yang diperlukan untuk menyelesaikan satu putaran penuh.',
+            Frekuensi: 'Frekuensi adalah banyaknya putaran atau getaran yang terjadi setiap satuan waktu.',
+            'Kecepatan Sudut': 'Kecepatan sudut menyatakan perubahan sudut tiap satuan waktu dan biasanya dilambangkan omega.',
+            'Kecepatan Tangensial': 'Kecepatan tangensial selalu menyinggung lintasan dan tegak lurus terhadap jari-jari.',
+            'Percepatan Sentripetal': 'Percepatan sentripetal selalu mengarah ke pusat lingkaran dan menjaga benda tetap pada lintasannya.',
+            'Hubungan Sudut dan Tangensial': 'Kecepatan tangensial berhubungan dengan kecepatan sudut melalui rumus v = omega r.',
+            'Roda Bersinggungan': 'Roda yang bersinggungan tanpa slip memiliki kecepatan tangensial yang sama pada titik singgung.',
+            'Hubungan Roda': 'Roda yang dihubungkan sabuk tanpa slip memiliki kecepatan tangensial yang sama, sedangkan kecepatan sudutnya bergantung pada jari-jari.'
+        };
+        questions.forEach(question => {
+            question.explanation = questionExplanations[question.competency] || 'Pahami definisi, hubungan antarbesaran, dan penerapan konsep ini dalam fisika.';
+            question.optionReasons = Object.fromEntries(question.options.map(option => [option.id, option.id === question.ans
+                ? `Benar. ${question.explanation}`
+                : `Pilihan ${option.id.toUpperCase()} tidak sesuai dengan konsep ${question.competency}.`]));
+        });
+
+        activeQuizQuestions = questions;
+        let currentQIndex = 0;
+        let answers = {};
+        let reviewMode = 'post';
+        
+        // Charts Objects
+        let lineChartObj = null;
+        let barChartObj = null;
+        let chapterProgressChartObj = null;
+        let selectedTeacherStudentId = null;
+
+        // Init Icons
+        lucide.createIcons();
+
+        function navigateTo(viewId) {
+            const targetView = document.getElementById(viewId);
+            if (!targetView || !targetView.classList.contains('view-section')) return;
+
+            document.querySelectorAll('.view-section').forEach(view => {
+                const isTarget = view === targetView;
+                view.classList.toggle('active', isTarget);
+                view.setAttribute('aria-hidden', String(!isTarget));
+            });
+            currentRoute = viewId;
+            window.scrollTo(0, 0);
+
+            if (viewId === 'view-teacher') {
+                updateTeacherTable();
+                initCharts();
+            }
+            if (viewId === 'view-chapters') renderChapters();
+            if (viewId === 'view-learning') renderLearningResource();
+        }
+
+        function getTopicScores(answerMap, quizQuestions = activeQuizQuestions) {
+            const totals = {};
+            const correct = {};
+            quizQuestions.forEach((question, index) => {
+                totals[question.topic] = (totals[question.topic] || 0) + 1;
+                if (answerMap[index] === question.ans) correct[question.topic] = (correct[question.topic] || 0) + 1;
+            });
+            return Object.fromEntries(Object.keys(totals).map(topic => [topic, Math.round(((correct[topic] || 0) / totals[topic]) * 100)]));
+        }
+
+        function getCompetencyScores(answerMap, quizQuestions = activeQuizQuestions) {
+            const totals = {};
+            const correct = {};
+            quizQuestions.forEach((question, index) => {
+                totals[question.competency] = (totals[question.competency] || 0) + 1;
+                if (answerMap[index] === question.ans) correct[question.competency] = (correct[question.competency] || 0) + 1;
+            });
+            return Object.fromEntries(Object.keys(totals).map(competency => [competency, Math.round(((correct[competency] || 0) / totals[competency]) * 100)]));
+        }
+
+        function renderChapters() {
+            if (!activeStudent) return;
+            const materials = classMaterials[activeStudent.kelas] || classMaterials['Kelas X'];
+            const materialFile = materialFiles[activeStudent.kelas] || materialFiles['Kelas X'];
+            document.getElementById('chapter-class-label').innerText = activeStudent.kelas;
+            document.getElementById('student-header-name').innerText = activeStudent?.name ? `Halo, ${activeStudent.name}` : '';
+            document.getElementById('material-card-title').innerText = materialFile.title;
+            document.getElementById('quiz-card-title').innerText = `Kuis Fisika ${activeStudent.kelas.replace('Kelas ', '')}`;
+            document.getElementById('material-view-link').href = materialFile.file;
+            document.getElementById('material-download-link').href = materialFile.file;
+            showClassOptions();
+            renderChapterProgress();
+            document.getElementById('chapter-list').innerHTML = materials.map((material, index) => `
+                <button onclick="selectChapter('${material.id}')" class="text-left bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:border-blue-400 hover:shadow-lg transition-all group">
+                    <div class="flex items-center justify-between mb-5">
+                        <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors"><i data-lucide="${material.icon}" class="w-6 h-6"></i></div>
+                        <span class="text-xs font-bold text-slate-400">0${index + 1}</span>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-800 mb-2">${material.title}</h2>
+                    <p class="text-sm text-slate-500 leading-relaxed mb-5">${material.description}</p>
+                    <span class="inline-flex items-center gap-2 text-sm font-semibold text-blue-600">Mulai bab <i data-lucide="arrow-right" class="w-4 h-4"></i></span>
+                </button>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function showQuizChapters() {
+            document.getElementById('class-options').classList.add('hidden');
+            document.getElementById('quiz-chapters-panel').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function showClassOptions() {
+            document.getElementById('class-options').classList.remove('hidden');
+            document.getElementById('quiz-chapters-panel').classList.add('hidden');
+        }
+
+        function renderChapterProgress() {
+            const history = getChapterHistory(activeStudent);
+            const completed = history.filter(record => record.status === 'Sudah selesai');
+            const average = key => completed.length ? Math.round(completed.reduce((total, record) => total + record[key], 0) / completed.length) : null;
+            const averagePre = average('preScore');
+            const averagePost = average('postScore');
+            const averageImprovement = average('improvement');
+            document.getElementById('chapter-completed-count').innerText = completed.length;
+            document.getElementById('chapter-pre-average').innerText = averagePre === null ? '-' : `${averagePre}%`;
+            document.getElementById('chapter-post-average').innerText = averagePost === null ? '-' : `${averagePost}%`;
+            document.getElementById('chapter-improvement-average').innerText = averageImprovement === null ? '-' : `${averageImprovement >= 0 ? '+' : ''}${averageImprovement}%`;
+            document.getElementById('chapter-progress-caption').innerText = completed.length
+                ? `${completed.length} bab sudah selesai. Grafik menampilkan perbandingan nilai di setiap bab.`
+                : 'Grafik akan muncul setelah kamu menyelesaikan satu bab.';
+            document.getElementById('chapter-empty-state').classList.toggle('hidden', completed.length > 0);
+            document.getElementById('chapter-progress-chart').parentElement.classList.toggle('hidden', completed.length === 0);
+            renderChapterHistory(history);
+            if (chapterProgressChartObj) chapterProgressChartObj.destroy();
+            if (!completed.length) return;
+            chapterProgressChartObj = new Chart(document.getElementById('chapter-progress-chart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: completed.map(record => record.shortTitle),
+                    datasets: [
+                        { label: 'Pre-Test', data: completed.map(record => record.preScore), backgroundColor: '#94a3b8', borderRadius: 6 },
+                        { label: 'Post-Test', data: completed.map(record => record.postScore), backgroundColor: '#2563eb', borderRadius: 6 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { min: 0, max: 100, ticks: { callback: value => `${value}%` } } } }
+            });
+        }
+
+        function renderChapterHistory(history) {
+            const list = document.getElementById('chapter-history-list');
+            if (!history.length) {
+                list.innerHTML = '<p class="text-sm text-slate-500 py-4">Belum ada riwayat bab yang dikerjakan.</p>';
+                return;
+            }
+            list.innerHTML = history.map((record, index) => {
+                const change = record.improvement === null || record.improvement === undefined ? '-' : `${record.improvement >= 0 ? '+' : ''}${record.improvement}%`;
+                const statusClass = record.status === 'Sudah selesai' ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700';
+                return `<details class="border border-slate-200 rounded-xl p-4"><summary class="cursor-pointer list-none"><div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3"><div><strong class="text-slate-800">${record.title}</strong><p class="text-xs text-slate-500 mt-1">${record.completedAt ? `Selesai ${record.completedAt}` : 'Sedang dipelajari'}</p></div><div class="flex flex-wrap items-center gap-2 text-sm"><span>Pre ${record.preScore ?? '-'}%</span><span>Post ${record.postScore ?? '-'}%</span><strong class="${record.improvement >= 0 ? 'text-green-600' : 'text-red-600'}">${change}</strong><span class="px-2 py-1 rounded-full text-xs font-semibold ${statusClass}">${record.status}</span></div></div></summary><div class="mt-4 pt-4 border-t border-slate-100 text-sm text-slate-600 space-y-2"><p><strong>Topik lemah:</strong> ${(record.weakTopics || []).join(', ') || '-'}</p><p><strong>Analisis AI:</strong> ${record.aiExplanation || '-'}</p><p><strong>Rekomendasi:</strong> ${record.recommendation || '-'}</p><p><strong>Evaluasi bab:</strong> ${record.postScore !== null && record.postScore !== undefined ? `Nilai ${record.postScore}% dengan perubahan ${change} dari Pre-Test.` : 'Belum tersedia.'}</p></div></details>`;
+            }).join('');
+        }
+
+        function selectChapter(chapterId) {
+            const materials = classMaterials[activeStudent.kelas] || classMaterials['Kelas X'];
+            selectedChapter = materials.find(material => material.id === chapterId) || materials[0];
+            activeStudent.chapterHistory = getChapterHistory(activeStudent);
+            if (!activeStudent.chapterHistory.some(record => record.chapterId === selectedChapter.id)) activeStudent.chapterHistory.push(createChapterRecord());
+            activeStudent.chapterId = selectedChapter.id;
+            updateGlobalData(activeStudent);
+            document.getElementById('chapter-choice-title').innerText = selectedChapter.title;
+            const dialog = document.getElementById('chapter-choice-dialog');
+            dialog.classList.remove('hidden');
+            dialog.classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function closeChapterChoice() {
+            const dialog = document.getElementById('chapter-choice-dialog');
+            dialog.classList.add('hidden');
+            dialog.classList.remove('flex');
+        }
+
+        function chooseChapterAction(action) {
+            closeChapterChoice();
+            if (action === 'learn') {
+                if (activeStudent?.kelas === 'Kelas X') {
+                    const pdfUrl = chapterPdfLinks['Kelas X']?.[selectedChapter?.id];
+                    if (pdfUrl) {
+                        window.open(pdfUrl, '_blank');
+                    } else {
+                        window.alert('Materi untuk bab ini belum tersedia.');
+                    }
+                    return;
+                }
+                learningMode = 'intro';
+                navigateTo('view-learning');
+            } else {
+                startQuiz('pre');
+            }
+        }
+
+        function openRecommendedMaterial() {
+            learningMode = 'recommendation';
+            navigateTo('view-learning');
+        }
+
+        function returnToChapterSelection() {
+            learningMode = 'intro';
+            navigateTo('view-chapters');
+        }
+
+        function analyzeStudent(student) {
+            const topicScores = student.topicScores || {};
+            const topics = Object.keys(topicScores);
+            const sorted = topics.sort((a, b) => topicScores[a] - topicScores[b]);
+            const weakestTopic = sorted[0] || 'Mekanika';
+            const strongestTopic = sorted[sorted.length - 1] || 'Mekanika';
+            const score = student.preScore || 0;
+            const riskLevel = weakestTopic && topicScores[weakestTopic] < 50 ? 'Tinggi' : score < 70 ? 'Sedang' : 'Rendah';
+            const aiConfidence = Math.min(96, Math.max(72, Math.round(78 + (100 - (topicScores[weakestTopic] || score)) / 5)));
+            return { ...student, weakestTopic, strongestTopic, riskLevel, aiConfidence, aiExplanation: generateAIExplanation({ ...student, weakestTopic, riskLevel }), aiRecommendation: generateAIRecommendation({ ...student, weakestTopic, strongestTopic, riskLevel }) };
+        }
+
+        function generateAIRecommendation(studentAnalysis) {
+            const resource = learningResources[studentAnalysis.weakestTopic];
+            if (!resource) return 'Materi pengayaan dan soal HOTS untuk memperluas penerapan konsep.';
+            if ((studentAnalysis.topicScores[studentAnalysis.weakestTopic] || 0) >= 80) return 'AI menyarankan materi pengayaan dan soal HOTS agar pemahaman semakin mendalam.';
+            return `AI menyarankan ${resource.type.toLowerCase()} "${resource.title}", review konsep dasar, dan latihan remedial 5 soal.`;
+        }
+
+        function generateAIExplanation(studentAnalysis) {
+            const weakScore = studentAnalysis.topicScores[studentAnalysis.weakestTopic] || 0;
+            return `Siswa dikategorikan ${studentAnalysis.status || 'Perlu Pendampingan'} karena penguasaan ${studentAnalysis.weakestTopic} berada di ${weakScore}% dan memerlukan penguatan pada kompetensi terkait. Insight ini adalah simulasi AI untuk ditinjau guru.`;
+        }
+
+        function normalizeStudent(student) {
+            const analyzed = analyzeStudent(student);
+            analyzed.improvement = analyzed.preScore !== undefined && analyzed.postScore !== undefined ? analyzed.postScore - analyzed.preScore : undefined;
+            analyzed.teacherDecision = analyzed.teacherDecision || 'Pending Teacher Review';
+            analyzed.attendance = analyzed.attendance || 92;
+            analyzed.lmsEngagement = analyzed.lmsEngagement || 'Medium';
+            analyzed.counselingRecord = analyzed.counselingRecord || 'None';
+            analyzed.extracurricular = analyzed.extracurricular || 'Active';
+            return analyzed;
+        }
+
+        allStudentsData = allStudentsData.map(normalizeStudent);
+
+        function getChapterHistory(student) {
+            return Array.isArray(student?.chapterHistory) ? student.chapterHistory : [];
+        }
+
+        function persistAppData() {
+            try {
+                localStorage.setItem(storageKey, JSON.stringify({ usersDb, students: allStudentsData }));
+            } catch (error) {
+                console.warn('Data progres belum dapat disimpan di browser.', error);
+            }
+        }
+
+        function loadPersistedData() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(storageKey) || '{}');
+                Object.assign(usersDb, saved.usersDb || {});
+                (saved.students || []).forEach(savedStudent => {
+                    const index = allStudentsData.findIndex(student => student.id === savedStudent.id || student.email === savedStudent.email);
+                    if (index >= 0) allStudentsData[index] = { ...allStudentsData[index], ...savedStudent };
+                    else allStudentsData.push(normalizeStudent(savedStudent));
+                });
+            } catch (error) {
+                console.warn('Data progres tersimpan tidak dapat dibaca.', error);
+            }
+        }
+
+        loadPersistedData();
+
+        // Auth Logic
+        function switchAuthMode() {
+            isSignUp = !isSignUp;
+            document.getElementById('auth-title').innerText = isSignUp ? 'Buat Akun Siswa' : 'Login Siswa';
+            document.getElementById('auth-subtitle').innerText = isSignUp ? 'Daftar untuk mulai belajar dan evaluasi AI' : 'Masuk kembali ke akun belajarmu';
+            document.getElementById('auth-switch-text').innerText = isSignUp ? 'Sudah punya akun? ' : 'Belum punya akun? ';
+            document.getElementById('auth-switch-btn').innerText = isSignUp ? 'Login di sini' : 'Daftar sekarang';
+            document.getElementById('auth-submit-btn').innerHTML = (isSignUp ? 'Daftar Akun' : 'Masuk') + ' <i data-lucide="chevron-right" class="w-4 h-4"></i>';
+            document.getElementById('auth-error').classList.add('hidden');
+            lucide.createIcons();
+        }
+
+        function togglePassword() {
+            const pwdInput = document.getElementById('auth-password');
+            const eyeIcon = document.getElementById('eye-icon');
+            if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+                eyeIcon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                pwdInput.type = 'password';
+                eyeIcon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        }
+
+        function showError(msg) {
+            const errDiv = document.getElementById('auth-error');
+            document.getElementById('auth-error-msg').innerText = msg;
+            errDiv.classList.remove('hidden');
+        }
+
+        function handleAuth(e) {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value;
+            const pwd = document.getElementById('auth-password').value;
+            document.getElementById('auth-error').classList.add('hidden');
+
+            if (isSignUp) {
+                if (usersDb[email]) {
+                    showError('Email sudah terdaftar. Silakan pindah ke mode Login.');
+                    return;
+                }
+                usersDb[email] = { password: pwd, profile: null };
+                activeEmail = email;
+                navigateTo('view-profile');
+            } else {
+                const user = usersDb[email];
+                if (!user) {
+                    showError('Email belum terdaftar. Silakan Daftar Akun terlebih dahulu.');
+                    return;
+                }
+                if (user.password !== pwd) {
+                    showError('Password yang Anda masukkan salah.');
+                    return;
+                }
+                activeEmail = email;
+                if (user.profile) {
+                    activeStudent = { ...user.profile, email: email, id: user.id };
+                    const materials = classMaterials[activeStudent.kelas] || classMaterials['Kelas X'];
+                    selectedChapter = materials.find(material => material.id === activeStudent.chapterId) || null;
+                    const currentRecord = getCurrentChapterRecord();
+                    if (user.profile.postScore !== undefined && currentRecord?.postTestReview?.length) {
+                        populateFinalResult();
+                        navigateTo('view-final');
+                    } else if (getChapterHistory(activeStudent).length) navigateTo('view-chapters');
+                    else if (user.profile.postScore !== undefined) navigateTo('view-final');
+                    else if (user.profile.preScore !== undefined) {
+                        populateResult();
+                        navigateTo('view-result');
+                    }
+                    else navigateTo('view-chapters');
+                } else {
+                    navigateTo('view-profile');
+                }
+            }
+        }
+
+        function handleProfileSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('profile-name').value;
+            const kelas = document.getElementById('profile-class').value;
+            const id = Date.now();
+            
+            activeStudent = { name, kelas, email: activeEmail, id };
+            usersDb[activeEmail].profile = activeStudent;
+            usersDb[activeEmail].id = id;
+            
+            navigateTo('view-chapters');
+        }
+
+        function logoutSiswa() {
+            activeEmail = '';
+            activeStudent = null;
+            selectedChapter = null;
+            document.getElementById('auth-email').value = '';
+            document.getElementById('auth-password').value = '';
+            document.getElementById('auth-error').classList.add('hidden');
+            navigateTo('view-landing');
+        }
+
+        function goToStudentHome() {
+            navigateTo('view-chapters');
+        }
+
+        function createChapterRecord() {
+            return { chapterId: selectedChapter.id, title: selectedChapter.title, shortTitle: `Bab ${selectedChapter.id.replace('bab-', '')}`, status: 'Sedang dipelajari', preScore: null, postScore: null, improvement: null, weakTopics: [], recommendation: '', aiExplanation: '', completedAt: null, preTestReview: [], postTestReview: [] };
+        }
+
+        function buildAnswerReview(quizQuestions, answerMap) {
+            return quizQuestions.map((question, index) => {
+                const selectedAnswerId = answerMap[index];
+                const selectedOption = question.options.find(option => option.id === selectedAnswerId);
+                const correctOption = question.options.find(option => option.id === question.ans);
+                return {
+                    questionId: question.id,
+                    question: question.text,
+                    selectedAnswerId,
+                    selectedAnswerText: selectedOption?.t || 'Tidak dijawab',
+                    correctAnswerId: question.ans,
+                    correctAnswerText: correctOption?.t || '',
+                    isCorrect: selectedAnswerId === question.ans,
+                    competency: question.competency,
+                    explanation: question.explanation,
+                    selectedReason: question.optionReasons?.[selectedAnswerId] || 'Soal ini belum dijawab.'
+                };
+            });
+        }
+
+        function startQuiz(mode) {
+            if (!selectedChapter) {
+                const materials = classMaterials[activeStudent.kelas] || classMaterials['Kelas X'];
+                selectedChapter = materials[0];
+            }
+            testMode = mode;
+            activeQuizQuestions = questions.filter(question => question.kelas === activeStudent.kelas && question.chapterId === selectedChapter.id);
+            if (activeQuizQuestions.length !== 10) console.warn(`Bank soal ${activeStudent.kelas} ${selectedChapter.id} berisi ${activeQuizQuestions.length} soal; seharusnya 10.`);
+            currentQIndex = 0;
+            answers = {};
+            document.getElementById('assessment-title').innerText = `${mode === 'pre' ? 'Pre-Test' : 'Post-Test Akhir'} - ${selectedChapter.title}`;
+            document.getElementById('assessment-student-name').innerText = activeStudent.name;
+            document.getElementById('ai-loading').classList.add('hidden');
+            renderQuestion();
+            navigateTo('view-assessment');
+        }
+
+        function startPostTest() {
+            startQuiz('post');
+        }
+
+        function renderQuestion() {
+            const q = activeQuizQuestions[currentQIndex];
+            document.getElementById('quiz-counter').innerText = `Soal ${currentQIndex + 1} dari ${activeQuizQuestions.length}`;
+            document.getElementById('quiz-question').innerText = q.text;
+            
+            const progress = (currentQIndex / activeQuizQuestions.length) * 100;
+            document.getElementById('quiz-progress').style.width = `${progress}%`;
+
+            const optsDiv = document.getElementById('quiz-options');
+            optsDiv.innerHTML = '';
+            
+            q.options.forEach(opt => {
+                const isSel = answers[currentQIndex] === opt.id;
+                const btn = document.createElement('button');
+                btn.className = `w-full text-left p-5 rounded-xl border-2 transition-all flex items-center gap-4 ${isSel ? 'border-blue-500 bg-blue-50 shadow-md ring-1 ring-blue-500' : 'border-slate-200 hover:border-blue-300 hover:bg-slate-50'}`;
+                btn.onclick = () => selectOption(opt.id);
+                btn.innerHTML = `
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-colors ${isSel ? 'bg-blue-500 text-white' : 'bg-slate-200 text-slate-600'}">${opt.id.toUpperCase()}</div>
+                    <span class="text-lg ${isSel ? 'font-medium text-blue-900' : 'text-slate-700'}">${opt.t}</span>
+                `;
+                optsDiv.appendChild(btn);
+            });
+
+            const btnPrev = document.getElementById('btn-prev');
+            if (currentQIndex === 0) {
+                btnPrev.disabled = true;
+                btnPrev.className = "px-6 py-3 rounded-xl font-semibold transition-all text-slate-300 cursor-not-allowed opacity-50";
+            } else {
+                btnPrev.disabled = false;
+                btnPrev.className = "px-6 py-3 rounded-xl font-semibold transition-all text-slate-600 hover:bg-slate-100";
+            }
+
+            const btnNext = document.getElementById('btn-next');
+            if (!answers[currentQIndex]) {
+                btnNext.disabled = true;
+                btnNext.className = "px-8 py-3 rounded-xl font-semibold flex items-center gap-2 transition-all transform active:scale-95 bg-slate-200 text-slate-400 cursor-not-allowed";
+            } else {
+                btnNext.disabled = false;
+                btnNext.className = "px-8 py-3 rounded-xl font-semibold flex items-center gap-2 transition-all transform active:scale-95 bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200";
+            }
+            
+            document.getElementById('btn-next-text').innerText = (currentQIndex === activeQuizQuestions.length - 1) ? 'Selesai & Evaluasi AI' : 'Selanjutnya';
+        }
+
+        function selectOption(id) {
+            answers[currentQIndex] = id;
+            renderQuestion();
+        }
+
+        function prevQuestion() {
+            if (currentQIndex > 0) {
+                currentQIndex--;
+                renderQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQIndex === activeQuizQuestions.length - 1) {
+                submitQuiz();
+            } else {
+                currentQIndex++;
+                renderQuestion();
+            }
+        }
+
+        function submitQuiz() {
+            document.getElementById('ai-loading').classList.remove('hidden');
+            
+            let correct = 0;
+            activeQuizQuestions.forEach((q, i) => { if (answers[i] === q.ans) correct++; });
+            const score = (correct / activeQuizQuestions.length) * 100;
+
+            setTimeout(() => {
+                const review = buildAnswerReview(activeQuizQuestions, answers);
+                if (testMode === 'pre') {
+                    activeStudent.preScore = score;
+                    activeStudent.topicScores = getTopicScores(answers, activeQuizQuestions);
+                    activeStudent.competencyScores = getCompetencyScores(answers, activeQuizQuestions);
+                    activeStudent.status = score >= 80 ? 'Sangat Baik' : score >= 60 ? 'Cukup' : 'Perlu Pendampingan';
+                    Object.assign(activeStudent, normalizeStudent(activeStudent));
+                    const analysis = normalizeStudent(activeStudent);
+                    const record = getChapterHistory(activeStudent).find(item => item.chapterId === selectedChapter.id) || createChapterRecord();
+                    if (!getChapterHistory(activeStudent).includes(record)) activeStudent.chapterHistory.push(record);
+                    Object.assign(record, { title: selectedChapter.title, shortTitle: `Bab ${selectedChapter.id.replace('bab-', '')}`, preScore: score, status: 'Sedang dipelajari', weakTopics: Object.entries(analysis.topicScores).filter(([, value]) => value < 70).map(([topic]) => topic), recommendation: analysis.aiRecommendation, aiExplanation: analysis.aiExplanation, preTestReview: review });
+                    updateGlobalData(activeStudent);
+                    
+                    populateResult();
+                    navigateTo('view-result');
+                } else {
+                    activeStudent.postScore = score;
+                    activeStudent.improvement = score - activeStudent.preScore;
+                    const record = getChapterHistory(activeStudent).find(item => item.chapterId === selectedChapter.id);
+                    if (record) Object.assign(record, { postScore: score, improvement: score - record.preScore, status: 'Sudah selesai', completedAt: new Date().toLocaleDateString('id-ID'), postTestReview: review });
+                    updateGlobalData(activeStudent);
+                    
+                    populateFinalResult();
+                    navigateTo('view-final');
+                }
+            }, 2000);
+        }
+
+        function updateGlobalData(stu) {
+            const idx = allStudentsData.findIndex(s => s.id === stu.id);
+            if (idx >= 0) allStudentsData[idx] = stu;
+            else allStudentsData.unshift(stu);
+            
+            if(usersDb[stu.email]) usersDb[stu.email].profile = stu;
+            persistAppData();
+        }
+
+        function populateResult() {
+            const score = activeStudent.preScore;
+            document.getElementById('res-name').innerText = activeStudent.name;
+            document.getElementById('result-chapter').innerText = `${selectedChapter?.title || 'Pre-Test Fisika'}`;
+            document.getElementById('res-score').innerText = score;
+            const analysis = normalizeStudent(activeStudent);
+            Object.assign(activeStudent, analysis);
+            document.getElementById('res-status').innerText = 'Status: ' + analysis.status;
+            const topics = Object.entries(analysis.topicScores || {});
+            document.getElementById('res-strengths').innerHTML = topics.filter(([, value]) => value >= 70).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([topic, value]) => `<li>${topic} (${value}%)</li>`).join('') || '<li>Belum ada topik kuat terdeteksi</li>';
+            document.getElementById('res-weaknesses').innerHTML = topics.filter(([, value]) => value < 70).sort((a, b) => a[1] - b[1]).slice(0, 3).map(([topic, value]) => `<li>${topic} (${value}%)</li>`).join('') || '<li>Semua topik berada pada tingkat baik</li>';
+            document.getElementById('res-ai-msg').innerText = analysis.aiRecommendation;
+            updateGlobalData(activeStudent);
+        }
+
+        function renderLearningResource() {
+            if (!activeStudent) return;
+            const analysis = normalizeStudent(activeStudent);
+            const chapterTopics = selectedChapter?.topics || ['Mekanika'];
+            const isRecommendation = learningMode === 'recommendation';
+            const weakCompetencies = Object.entries(analysis.competencyScores || {})
+                .filter(([, score]) => score < 70)
+                .sort(([, scoreA], [, scoreB]) => scoreA - scoreB);
+            const getCompetencyStatus = score => score < 40 ? 'Sangat perlu dikuatkan' : score < 70 ? 'Perlu dikuatkan' : score < 85 ? 'Cukup dikuasai' : 'Sudah dikuasai';
+            document.getElementById('learning-header-title').innerText = isRecommendation ? 'Rekomendasi Materi AI' : `Materi ${selectedChapter?.title || 'Bab'}`;
+            document.getElementById('learning-content-title').innerText = isRecommendation ? `Perbaiki: ${selectedChapter?.title || 'Bab ini'}` : selectedChapter?.title || 'Materi Bab';
+
+            if (isRecommendation && Object.keys(analysis.competencyScores || {}).length) {
+                document.getElementById('learning-text-content').innerHTML = weakCompetencies.length
+                    ? `<div class="space-y-4"><div><h3 class="text-lg font-bold text-slate-800">Bagian yang Perlu Dikuatkan</h3><p class="text-slate-600 mt-1">Berdasarkan hasil Pre-Test, fokus utama belajarmu adalah:</p></div>${weakCompetencies.map(([competency, score]) => {
+                        const lesson = competencyLessons[competency] || { title: competency, explanation: 'Pelajari kembali konsep utama pada bagian ini dan hubungkan dengan contoh soal yang relevan.' };
+                        return `<article class="p-5 rounded-xl border border-amber-200 bg-amber-50/60"><div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3"><div><h3 class="font-bold text-lg text-slate-800">${lesson.title}</h3><p class="text-sm text-slate-500 mt-1">Penguasaan: ${score}%</p></div><span class="self-start px-3 py-1 rounded-full text-xs font-semibold ${score < 40 ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}">${getCompetencyStatus(score)}</span></div><div class="h-2 bg-white rounded-full overflow-hidden mb-4"><div class="h-2 rounded-full ${score < 40 ? 'bg-red-500' : 'bg-amber-500'}" style="width: ${score}%"></div></div><h4 class="font-semibold text-slate-800 mb-2">Materi Penguatan</h4><p class="text-slate-600 leading-relaxed text-sm whitespace-pre-line">${lesson.explanation}</p></article>`;
+                    }).join('')}</div>`
+                    : '<div class="p-5 rounded-xl border border-green-200 bg-green-50"><p class="font-semibold text-green-800">Pemahamanmu pada bab ini sudah baik.</p><p class="text-sm text-green-700 mt-1">Silakan lanjutkan ke Post-Test atau pelajari materi pengayaan.</p></div>';
+                document.getElementById('learning-instruction-title').innerText = 'Fokus Belajar:';
+                document.getElementById('learning-resource-description').innerText = weakCompetencies.length
+                    ? 'Pelajari seluruh bagian yang perlu dikuatkan di atas sebelum mengerjakan Post-Test.'
+                    : 'Silakan lanjutkan ke Post-Test atau pelajari materi pengayaan.';
+            } else {
+                document.getElementById('learning-text-content').innerHTML = chapterTopics.map(topic => {
+                    const lesson = lessonContent[topic] || { title: topic, text: 'Pelajari konsep utama pada topik ini dan hubungkan dengan contoh dalam kehidupan sehari-hari.' };
+                    return `<article class="p-5 rounded-xl border border-slate-200 bg-slate-50"><h3 class="font-bold text-lg text-slate-800 mb-2">${lesson.title}</h3><p class="text-slate-600 leading-relaxed text-sm">${lesson.text}</p></article>`;
+                }).join('');
+                document.getElementById('learning-instruction-title').innerText = 'Petunjuk Belajar:';
+                document.getElementById('learning-resource-description').innerText = `Pelajari materi teks untuk ${selectedChapter?.title || 'bab pilihanmu'}. Setelah selesai, kamu dapat kembali memilih bab atau memulai Pre-Test.`;
+            }
+            const actionButton = document.getElementById('learning-action-button');
+            actionButton.innerHTML = `${isRecommendation ? 'Mulai Post-Test' : 'Mulai Pre-Test'} <i data-lucide="chevron-right" class="w-5 h-5"></i>`;
+            actionButton.onclick = isRecommendation ? startPostTest : () => startQuiz('pre');
+            document.getElementById('learning-back-button').classList.toggle('hidden', isRecommendation);
+            lucide.createIcons();
+        }
+
+        function populateFinalResult() {
+            const pre = activeStudent.preScore || 0;
+            const post = activeStudent.postScore || 0;
+            const imp = post - pre;
+            
+            document.getElementById('final-name').innerText = activeStudent.name;
+            document.getElementById('final-pre-score').innerText = pre + '%';
+            document.getElementById('final-post-score').innerText = post + '%';
+            
+            const impEl = document.getElementById('final-improvement');
+            impEl.innerHTML = `<i data-lucide="${imp >= 0 ? 'trending-up' : 'trending-down'}" class="w-4 h-4"></i> ${imp >= 0 ? 'Naik' : 'Turun'} ${Math.abs(imp)}%`;
+            impEl.className = `flex items-center gap-1 bg-white/20 px-3 py-1 rounded-full text-sm font-medium mt-2 ${imp < 0 ? 'text-red-100' : ''}`;
+            
+            let msg = "";
+            if (imp > 0) msg = "Luar biasa! Kamu menunjukkan peningkatan yang signifikan setelah mempelajari rekomendasi materi. Pemahaman konsepmu jauh lebih matang.";
+            else if (imp === 0) msg = "Nilaimu stabil. Pertahankan semangat belajarmu dan jangan ragu untuk bertanya pada guru jika ada konsep yang masih membingungkan.";
+            else msg = "Sepertinya kamu butuh sedikit lebih banyak waktu untuk menguasai materi ini. Jangan menyerah, AI telah mengirimkan catatan khusus ke gurumu.";
+            
+            document.getElementById('final-ai-msg').innerText = msg;
+            renderAnswerReview('post');
+            lucide.createIcons();
+        }
+
+        function getCurrentChapterRecord() {
+            return getChapterHistory(activeStudent).find(record => record.chapterId === selectedChapter?.id);
+        }
+
+        function escapeReviewText(value) {
+            return String(value ?? '').replace(/[&<>"]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[character]));
+        }
+
+        function renderAnswerReview(mode = reviewMode) {
+            reviewMode = mode;
+            const record = getCurrentChapterRecord();
+            const reviews = record?.[mode === 'pre' ? 'preTestReview' : 'postTestReview'] || [];
+            const list = document.getElementById('answer-review-list');
+            if (!list) return;
+            document.getElementById('review-tab-pre').className = `px-4 py-2 rounded-lg text-sm font-semibold ${mode === 'pre' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'}`;
+            document.getElementById('review-tab-post').className = `px-4 py-2 rounded-lg text-sm font-semibold ${mode === 'post' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'}`;
+            if (!reviews.length) {
+                document.getElementById('review-summary').innerText = `${mode === 'pre' ? 'Pre-Test' : 'Post-Test'} belum memiliki data rekapan.`;
+                list.innerHTML = '<p class="text-sm text-slate-500 py-4">Rekapan jawaban belum tersedia untuk percobaan ini.</p>';
+                return;
+            }
+            const correctCount = reviews.filter(review => review.isCorrect).length;
+            document.getElementById('review-summary').innerHTML = `<span class="font-semibold">${mode === 'pre' ? 'Pre-Test' : 'Post-Test'}</span> &middot; Benar: <strong class="text-green-700">${correctCount}</strong> &middot; Salah: <strong class="text-red-700">${reviews.length - correctCount}</strong> &middot; Total: <strong>${reviews.length}</strong> &middot; Nilai: <strong>${Math.round(correctCount / reviews.length * 100)}%</strong>`;
+            list.innerHTML = reviews.map((review, index) => {
+                const statusClass = review.isCorrect ? 'border-green-200 bg-green-50/40' : 'border-red-200 bg-red-50/40';
+                const badgeClass = review.isCorrect ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
+                const statusLabel = review.isCorrect ? 'Jawaban Benar' : 'Jawaban Salah';
+                const selectedLabel = `${review.selectedAnswerId ? review.selectedAnswerId.toUpperCase() + '. ' : ''}${review.selectedAnswerText}`;
+                const correctLabel = `${review.correctAnswerId.toUpperCase()}. ${review.correctAnswerText}`;
+                return `<article class="p-5 rounded-xl border ${statusClass}"><div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"><h3 class="font-bold text-slate-800">Soal ${index + 1}</h3><span class="self-start px-3 py-1 rounded-full text-xs font-semibold ${badgeClass}"><i data-lucide="${review.isCorrect ? 'check-circle-2' : 'x-circle'}" class="inline-block w-4 h-4 align-text-bottom mr-1"></i>${statusLabel}</span></div><p class="text-slate-700 font-medium mb-4">${escapeReviewText(review.question)}</p><div class="space-y-2 text-sm"><p><strong>Jawaban kamu:</strong> ${escapeReviewText(selectedLabel)}</p>${review.isCorrect ? '' : `<p><strong>Jawaban benar:</strong> ${escapeReviewText(correctLabel)}</p><div class="pt-3 mt-3 border-t border-red-100"><p class="font-semibold text-slate-800">Kenapa jawaban kamu salah?</p><p class="text-slate-600 mt-1">${escapeReviewText(review.selectedReason)}</p></div>`}<div class="pt-3 mt-3 border-t border-slate-200"><p class="font-semibold text-slate-800">${review.isCorrect ? 'Kenapa jawaban ini benar?' : `Kenapa jawaban ${review.correctAnswerId.toUpperCase()} benar?`}</p><p class="text-slate-600 mt-1">${escapeReviewText(review.isCorrect ? review.explanation : review.explanation)}</p></div><p class="pt-3 mt-3 border-t border-slate-200"><strong>Kompetensi:</strong> ${escapeReviewText(review.competency)}</p></div></article>`;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function downloadAnswerReview() {
+            const record = getCurrentChapterRecord();
+            if (!record) return;
+            const pdfApi = window.jspdf?.jsPDF;
+            if (!pdfApi) {
+                window.alert('Fitur PDF belum siap. Silakan coba lagi setelah halaman selesai dimuat.');
+                return;
+            }
+            const documentPdf = new pdfApi();
+            const left = 18;
+            const pageWidth = documentPdf.internal.pageSize.getWidth();
+            const pageHeight = documentPdf.internal.pageSize.getHeight();
+            let y = 18;
+            const addText = (text, size = 10, bold = false, gap = 6) => {
+                documentPdf.setFont('helvetica', bold ? 'bold' : 'normal');
+                documentPdf.setFontSize(size);
+                const lines = documentPdf.splitTextToSize(String(text), pageWidth - left * 2);
+                if (y + lines.length * (size * 0.5 + 2) > pageHeight - 15) { documentPdf.addPage(); y = 18; }
+                documentPdf.text(lines, left, y);
+                y += lines.length * (size * 0.5 + 2) + gap;
+            };
+            const addReviewSection = (title, reviews) => {
+                addText(title, 13, true, 8);
+                if (!reviews?.length) { addText('Belum ada data.', 10, false, 6); return; }
+                reviews.forEach((review, index) => {
+                    addText(`Soal ${index + 1}`, 11, true, 3);
+                    addText(`Pertanyaan: ${review.question}`);
+                    addText(`Jawaban siswa: ${review.selectedAnswerId ? review.selectedAnswerId.toUpperCase() + '. ' : ''}${review.selectedAnswerText}`);
+                    addText(`Jawaban benar: ${review.correctAnswerId.toUpperCase()}. ${review.correctAnswerText}`);
+                    addText(`Status: ${review.isCorrect ? 'BENAR' : 'SALAH'}`);
+                    if (!review.isCorrect) addText(`Alasan jawaban siswa: ${review.selectedReason}`);
+                    addText(`Penjelasan: ${review.explanation}`);
+                    addText(`Kompetensi: ${review.competency}`, 10, false, 8);
+                });
+            };
+            addText('EDUAI INSIGHT', 16, true, 3);
+            addText('REKAPAN HASIL BELAJAR', 13, true, 8);
+            addText(`Nama siswa: ${activeStudent.name}`);
+            addText(`Kelas: ${activeStudent.kelas}`);
+            addText(`Bab: ${record.title}`);
+            addText(`Tanggal: ${new Date().toLocaleDateString('id-ID')}`);
+            addText(`Nilai Pre-Test: ${record.preScore ?? '-'}%`);
+            addText(`Nilai Post-Test: ${record.postScore ?? '-'}%`);
+            addText(`Peningkatan: ${record.improvement === null || record.improvement === undefined ? '-' : `${record.improvement >= 0 ? '+' : ''}${record.improvement}%`}`, 10, false, 10);
+            addReviewSection('REKAPAN PRE-TEST', record.preTestReview);
+            addReviewSection('REKAPAN POST-TEST', record.postTestReview);
+            const safeName = `${activeStudent.name}_${activeStudent.kelas}_${record.shortTitle}`.replace(/[^a-z0-9_-]+/gi, '_').replace(/^_+|_+$/g, '');
+            documentPdf.save(`Rekapan_Fisika_${safeName || 'Siswa'}.pdf`);
+        }
+
+        function setTeacherMenu(menu) {
+            document.getElementById('teacher-sub-dashboard').classList.add('hidden');
+            document.getElementById('teacher-sub-ai').classList.add('hidden');
+            document.getElementById('teacher-sub-analytics').classList.add('hidden');
+            document.getElementById('teacher-sub-progress').classList.add('hidden');
+            
+            ['dashboard', 'ai', 'analytics', 'progress'].forEach(name => {
+                document.getElementById(`menu-${name}`).className = "menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-left text-slate-500 hover:bg-slate-50 hover:text-slate-700";
+            });
+
+            if (menu === 'dashboard') {
+                document.getElementById('teacher-sub-dashboard').classList.remove('hidden');
+                document.getElementById('teacher-view-title').innerText = "Dashboard";
+            } else if (menu === 'ai') {
+                document.getElementById('teacher-sub-ai').classList.remove('hidden');
+                document.getElementById('teacher-sub-ai').classList.add('flex');
+                document.getElementById('teacher-view-title').innerText = "AI Recommendation";
+            } else if (menu === 'analytics') {
+                document.getElementById('teacher-sub-analytics').classList.remove('hidden');
+                renderAnalyticsList();
+                document.getElementById('teacher-view-title').innerText = "Student Analytics";
+            } else {
+                document.getElementById('teacher-sub-progress').classList.remove('hidden');
+                renderProgressList();
+                document.getElementById('teacher-view-title').innerText = "Learning Progress";
+            }
+            document.getElementById(`menu-${menu}`).classList.add('bg-blue-50', 'text-blue-700', 'font-medium');
+            document.getElementById(`menu-${menu}`).classList.remove('text-slate-500', 'hover:bg-slate-50');
+        }
+
+        function updateTeacherTable() {
+            const scores = allStudentsData.map(student => student.postScore ?? student.preScore ?? 0);
+            const topicTotals = {};
+            allStudentsData.forEach(student => Object.entries(student.topicScores || {}).forEach(([topic, score]) => { topicTotals[topic] = (topicTotals[topic] || []).concat(score); }));
+            const hardest = Object.entries(topicTotals).sort((a, b) => (a[1].reduce((x, y) => x + y, 0) / a[1].length) - (b[1].reduce((x, y) => x + y, 0) / b[1].length))[0];
+            const completed = allStudentsData.filter(student => student.improvement !== undefined);
+            document.getElementById('stat-total').innerText = allStudentsData.length;
+            document.getElementById('stat-average').innerText = `${Math.round(scores.reduce((x, y) => x + y, 0) / Math.max(scores.length, 1))}%`;
+            document.getElementById('stat-intervention').innerText = allStudentsData.filter(student => student.status === 'Perlu Pendampingan' || student.riskLevel === 'Tinggi').length;
+            document.getElementById('stat-hardest').innerText = hardest ? hardest[0] : '-';
+            const tbody = document.getElementById('student-table-body');
+            tbody.innerHTML = '';
+            
+            allStudentsData.forEach(s => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition-colors';
+                
+                let badgeClass = 'bg-red-100 text-red-700';
+                if (s.status === 'Sangat Baik') badgeClass = 'bg-green-100 text-green-700';
+                else if (s.status === 'Cukup') badgeClass = 'bg-blue-100 text-blue-700';
+                else if (s.status === 'Perlu Pendampingan') badgeClass = 'bg-yellow-100 text-yellow-700';
+
+                tr.innerHTML = `
+                    <td class="px-6 py-4"><button onclick="setTeacherMenu('analytics'); showStudentAnalytics(${s.id})" class="text-left"><p class="font-medium text-blue-700 hover:underline">${s.name}</p><p class="text-xs text-slate-400">${s.kelas}</p></button></td>
+                    <td class="px-6 py-4 font-bold text-slate-700">${s.preScore !== undefined ? s.preScore + '%' : '-'}</td>
+                    <td class="px-6 py-4 font-bold text-blue-600">${s.postScore !== undefined ? s.postScore + '%' : '<span class="text-slate-300 font-normal italic">Belum</span>'}</td>
+                    <td class="px-6 py-4"><span class="px-3 py-1 rounded-full text-xs font-medium ${badgeClass}">${s.status || '-'}</span></td>
+                    <td class="px-6 py-4 text-sm text-slate-600">${s.aiRecommendation || s.rec || '-'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderAnalyticsList() {
+            const list = document.getElementById('analytics-student-list');
+            list.innerHTML = allStudentsData.map(student => `<button onclick="showStudentAnalytics(${student.id})" class="text-left p-4 rounded-xl border border-slate-200 hover:border-blue-400 hover:bg-blue-50"><span class="font-semibold text-slate-800">${student.name}</span><span class="block text-xs text-slate-500">${student.kelas} · ${student.status}</span></button>`).join('');
+        }
+
+        function showStudentAnalytics(id) {
+            const student = normalizeStudent(allStudentsData.find(item => item.id === id));
+            if (!student) return;
+            const topics = Object.entries(student.topicScores || {});
+            document.getElementById('analytics-detail').innerHTML = `
+                <div class="flex flex-col md:flex-row md:justify-between gap-3 mb-6"><div><h3 class="text-xl font-bold text-slate-800">${student.name}</h3><p class="text-sm text-slate-500">${student.kelas} · Data considered by AI: academic performance, assessment history, attendance, engagement</p></div><span class="px-3 py-1 h-fit rounded-full text-sm font-semibold ${student.riskLevel === 'Tinggi' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}">Risk Level: ${student.riskLevel}</span></div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6"><div class="p-4 bg-slate-50 rounded-xl"><p class="text-xs text-slate-500">Pre-Test</p><strong>${student.preScore ?? 0}%</strong></div><div class="p-4 bg-slate-50 rounded-xl"><p class="text-xs text-slate-500">Post-Test</p><strong>${student.postScore ?? '-'}${student.postScore !== undefined ? '%' : ''}</strong></div><div class="p-4 bg-slate-50 rounded-xl"><p class="text-xs text-slate-500">Improvement</p><strong>${student.improvement ?? '-'}${student.improvement !== undefined ? '%' : ''}</strong></div><div class="p-4 bg-blue-50 rounded-xl"><p class="text-xs text-blue-600">AI Confidence</p><strong class="text-blue-700">${student.aiConfidence}%</strong></div></div>
+                <h4 class="font-bold text-slate-800 mb-3">Topic Mastery</h4>${topics.map(([topic, score]) => `<div class="mb-3"><div class="flex justify-between text-sm mb-1"><span>${topic}</span><strong>${score}%</strong></div><div class="h-2 bg-slate-100 rounded-full"><div class="h-2 rounded-full ${score < 50 ? 'bg-red-500' : score < 70 ? 'bg-yellow-500' : 'bg-green-500'}" style="width:${score}%"></div></div></div>`).join('')}
+                <div class="mt-6 p-4 rounded-xl bg-amber-50 border border-amber-100"><h4 class="font-bold text-amber-800">AI Explanation</h4><p class="text-sm text-slate-700 mt-1">${student.aiExplanation}</p><p class="text-xs text-amber-700 mt-2">Prototype AI factor visualization: Academic 50% · Assessment 30% · Attendance 10% · Engagement 10%</p></div>
+                <div class="mt-6 p-4 rounded-xl bg-blue-50 border border-blue-100"><h4 class="font-bold text-blue-800">AI Suggested Intervention</h4><p id="recommendation-${id}" class="text-sm text-slate-700 mt-1">${student.aiRecommendation}</p><p class="text-xs text-slate-500 mt-2">Teacher approval required</p><div class="flex flex-wrap gap-2 mt-4"><button onclick="decideRecommendation(${id}, 'Approved')" class="px-3 py-2 bg-green-600 text-white rounded-lg text-sm">Approve</button><button onclick="modifyRecommendation(${id})" class="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm">Modify</button><button onclick="decideRecommendation(${id}, 'Rejected')" class="px-3 py-2 bg-red-600 text-white rounded-lg text-sm">Reject</button></div><p id="decision-${id}" class="text-sm font-semibold mt-3">${student.teacherDecision}</p></div>
+                <div class="mt-6 text-sm text-slate-600"><strong>Data Considered by AI:</strong> Academic Performance · Attendance ${student.attendance}% · Learning Engagement ${student.lmsEngagement} · Assessment History · BK ${student.counselingRecord} · Extracurricular ${student.extracurricular}</div>`;
+        }
+
+        function decideRecommendation(id, decision) {
+            const student = allStudentsData.find(item => item.id === id);
+            student.teacherDecision = decision === 'Approved' ? '✓ Approved by Teacher' : 'AI Recommendation Rejected';
+            updateGlobalData(student);
+            document.getElementById(`decision-${id}`).innerText = student.teacherDecision;
+        }
+
+        function modifyRecommendation(id) {
+            const student = allStudentsData.find(item => item.id === id);
+            const modified = window.prompt('Ubah rekomendasi intervensi:', student.teacherModifiedRecommendation || student.aiRecommendation);
+            if (modified) { student.teacherModifiedRecommendation = modified; student.teacherDecision = 'Modified by Teacher'; updateGlobalData(student); showStudentAnalytics(id); }
+        }
+
+        function renderProgressList() {
+            loadPersistedData();
+            document.getElementById('progress-list').innerHTML = allStudentsData.map(student => `<button onclick="showTeacherProgress(${student.id})" class="w-full text-left p-4 border border-slate-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-colors"><div class="flex justify-between"><strong>${student.name}</strong><span class="text-sm text-slate-500">${getChapterHistory(student).length} bab tercatat</span></div><p class="text-xs text-slate-500 mt-1">${student.kelas}</p></button>`).join('');
+            if (selectedTeacherStudentId) showTeacherProgress(selectedTeacherStudentId);
+        }
+
+        function showTeacherProgress(id) {
+            const student = allStudentsData.find(item => item.id === id);
+            if (!student) return;
+            selectedTeacherStudentId = id;
+            const history = getChapterHistory(student);
+            document.getElementById('teacher-progress-detail').innerHTML = `<div class="flex justify-between gap-3 mb-5"><div><h3 class="text-xl font-bold text-slate-800">${student.name}</h3><p class="text-sm text-slate-500">${student.kelas} · ${history.length} bab</p></div><button onclick="downloadTeacherReport(${student.id})" class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold flex items-center gap-2"><i data-lucide="download" class="w-4 h-4"></i> Download</button></div>${history.length ? `<div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="bg-slate-50"><tr><th class="p-3">Bab</th><th class="p-3">Pre</th><th class="p-3">Post</th><th class="p-3">Perubahan</th><th class="p-3">Status</th></tr></thead><tbody class="divide-y divide-slate-100">${history.map(record => `<tr><td class="p-3"><strong>${record.title}</strong><p class="text-xs text-slate-500">Lemah: ${(record.weakTopics || []).join(', ') || '-'}</p><p class="text-xs text-slate-500">Analisis AI: ${record.aiExplanation || '-'}</p><p class="text-xs text-slate-500">Rekomendasi: ${record.recommendation || '-'}</p></td><td class="p-3">${record.preScore ?? '-'}${record.preScore !== null ? '%' : ''}</td><td class="p-3">${record.postScore ?? '-'}${record.postScore !== null ? '%' : ''}</td><td class="p-3 font-semibold ${record.improvement >= 0 ? 'text-green-600' : 'text-red-600'}">${record.improvement === null ? '-' : `${record.improvement >= 0 ? '+' : ''}${record.improvement}%`}</td><td class="p-3"><span class="px-2 py-1 rounded-full text-xs font-semibold ${record.status === 'Sudah selesai' ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'}">${record.status}</span><p class="text-xs text-slate-500 mt-1">${record.completedAt || '-'}</p></td></tr>`).join('')}</tbody></table></div>` : '<p class="text-sm text-slate-500">Belum ada bab yang dikerjakan siswa ini.</p>'}`;
+            lucide.createIcons();
+        }
+
+        function buildReportHtml(student) {
+            const history = getChapterHistory(student);
+            const completed = history.filter(record => record.status === 'Sudah selesai');
+            const average = key => completed.length ? Math.round(completed.reduce((sum, record) => sum + record[key], 0) / completed.length) : 0;
+            return `<html><head><title>Laporan Perkembangan - ${student.name}</title><style>body{font-family:Arial,sans-serif;color:#1e293b;padding:32px;line-height:1.5}h1{color:#1d4ed8;margin-bottom:4px}h2{border-bottom:2px solid #dbeafe;padding-bottom:6px;margin-top:28px}table{width:100%;border-collapse:collapse;margin-top:12px}th,td{border:1px solid #cbd5e1;padding:9px;text-align:left;font-size:12px}th{background:#eff6ff}.summary{display:flex;gap:24px;margin:18px 0}.summary strong{font-size:20px;display:block;color:#1d4ed8}.muted{color:#64748b;font-size:12px}</style></head><body><h1>Laporan Perkembangan Siswa</h1><p class="muted">Tanggal laporan: ${new Date().toLocaleDateString('id-ID')}</p><p><strong>Nama:</strong> ${student.name}<br><strong>Kelas:</strong> ${student.kelas}</p><div class="summary"><div>Bab selesai<strong>${completed.length}</strong></div><div>Rata-rata Pre-Test<strong>${average('preScore')}%</strong></div><div>Rata-rata Post-Test<strong>${average('postScore')}%</strong></div><div>Peningkatan rata-rata<strong>${completed.length ? `${average('improvement') >= 0 ? '+' : ''}${average('improvement')}%` : '-'}</strong></div></div><h2>Riwayat per Bab</h2><table><tr><th>Bab</th><th>Pre-Test</th><th>Post-Test</th><th>Perubahan</th><th>Status</th><th>Topik Perlu Diperbaiki</th><th>Rekomendasi AI</th></tr>${history.map(record => `<tr><td>${record.title}</td><td>${record.preScore ?? '-' }%</td><td>${record.postScore ?? '-' }%</td><td>${record.improvement === null ? '-' : `${record.improvement >= 0 ? '+' : ''}${record.improvement}%`}</td><td>${record.status}<br>${record.completedAt || ''}</td><td>${(record.weakTopics || []).join(', ') || '-'}</td><td>${record.recommendation || '-'}</td></tr>`).join('')}</table><h2>Ringkasan</h2><p>Perkembangan siswa dirangkum dari ${completed.length} bab yang sudah selesai. Nilai dan rekomendasi pada laporan ini berasal dari hasil kuis siswa.</p></body></html>`;
+        }
+
+        function printReport(student) {
+            const reportWindow = window.open('', '_blank');
+            if (!reportWindow) return;
+            reportWindow.document.write(buildReportHtml(student));
+            reportWindow.document.close();
+            reportWindow.focus();
+            reportWindow.print();
+        }
+
+        function downloadStudentReport() {
+            if (activeStudent) printReport(activeStudent);
+        }
+
+        function downloadTeacherReport(id = selectedTeacherStudentId) {
+            const student = allStudentsData.find(item => item.id === id);
+            if (student) printReport(student);
+        }
+
+        function sendProgressToTeacher() {
+            if (!activeStudent) return;
+            activeStudent.progressSharedAt = new Date().toLocaleString('id-ID');
+            updateGlobalData(activeStudent);
+            window.alert('Perkembangan belajar sudah dikirim dan tersedia pada menu Learning Progress guru.');
+        }
+
+        function handleStudentChat(e) {
+            e.preventDefault();
+            const input = document.getElementById('student-chat-input');
+            const response = document.getElementById('student-chat-response');
+            const analysis = normalizeStudent(activeStudent);
+            const askedTopic = input.value.toLowerCase().includes('gelombang') ? 'Gelombang' : analysis.weakestTopic;
+            const score = analysis.topicScores[askedTopic] || 0;
+            response.innerText = `Berdasarkan hasil pre-test, penguasaanmu pada ${askedTopic} masih ${score}%. EduAI menyarankan ${learningResources[askedTopic]?.type.toLowerCase() || 'materi tambahan'} dan latihan sebelum post-test. Guru tetap meninjau rekomendasi ini.`;
+            response.classList.remove('hidden');
+            input.value = '';
+        }
+
+        function initCharts() {
+            if (lineChartObj) lineChartObj.destroy();
+            if (barChartObj) barChartObj.destroy();
+
+            const ctxLine = document.getElementById('lineChart').getContext('2d');
+            lineChartObj = new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei'],
+                    datasets: [
+                        { label: 'Pre-Test', data: [60, 65, 62, 68, 70], borderColor: '#94a3b8', borderWidth: 3, tension: 0.4 },
+                        { label: 'Post-Test', data: [75, 78, 80, 85, 88], borderColor: '#3b82f6', borderWidth: 3, tension: 0.4 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { min: 0, max: 100 } } }
+            });
+
+            const ctxBar = document.getElementById('barChart').getContext('2d');
+            barChartObj = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: ['Mekanika', 'Fluida', 'Gelombang', 'Listrik', 'Optik'],
+                    datasets: [{ label: 'Pemahaman (%)', data: [85, 75, 60, 70, 82], backgroundColor: '#06b6d4', borderRadius: 4 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 100 } } }
+            });
+        }
+
+        function handleChatSubmit(e) {
+            e.preventDefault();
+            const inputEl = document.getElementById('chat-input');
+            const txt = inputEl.value.trim();
+            if (!txt) return;
+
+            const chatBox = document.getElementById('chat-history');
+            
+            // Add user msg
+            chatBox.innerHTML += `
+                <div class="flex justify-end">
+                    <div class="max-w-[75%] p-4 rounded-2xl bg-blue-600 text-white rounded-tr-none shadow-sm">
+                        <p class="text-sm leading-relaxed">${txt}</p>
+                    </div>
+                </div>
+            `;
+            inputEl.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Simulate AI
+            setTimeout(() => {
+                let aiRes = "Saya sedang menganalisis data tersebut. Berikan saya waktu sebentar.";
+                if (txt.toLowerCase().includes('listrik')) {
+                    aiRes = "Berdasarkan data evaluasi terbaru, sebagian besar siswa mengalami miskonsepsi pada konsep beda potensial dan arus listrik. Saya menyarankan penggunaan simulasi visual PhET untuk materi sirkuit DC.";
+                }
+                chatBox.innerHTML += `
+                    <div class="flex justify-start">
+                        <div class="max-w-[75%] p-4 rounded-2xl bg-slate-100 text-slate-700 rounded-tl-none border border-slate-200">
+                            <p class="text-sm leading-relaxed">${aiRes}</p>
+                        </div>
+                    </div>
+                `;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

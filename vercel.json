@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/eduai_insight_prototype.html"
+    }
+  ]
+}
